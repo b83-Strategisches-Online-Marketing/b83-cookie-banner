@@ -1,0 +1,17 @@
+/* b83 Cookie Banner – Backend */
+.b83-cb-admin__footer { margin-top: 24px; color: #646970; font-size: 12px; }
+.b83-cb-card { max-width: 1100px; margin: 16px 0; padding: 4px 20px 16px; background: #fff; border: 1px solid #c3c4c7; border-radius: 4px; }
+.b83-cb-langs { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 16px; max-width: 1400px; }
+.b83-cb-langs .b83-cb-card { margin: 0; }
+.b83-cb-services { max-width: 1100px; }
+.b83-cb-services td { vertical-align: top; }
+.b83-cb-services .description { margin-top: 4px; }
+.b83-cb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0 16px; }
+.b83-cb-custom { position: relative; }
+.b83-cb-remove-custom { color: #b32d2e !important; }
+.b83-cb-warning { color: #8a1f11; }
+.b83-cb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 8px 0 12px; }
+.b83-cb-stat { background: #f6f7f7; border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.b83-cb-stat strong { font-size: 18px; }
+.b83-cb-search { margin: 16px 0; }
+.b83-cb-list { list-style: disc; margin-left: 20px; }
