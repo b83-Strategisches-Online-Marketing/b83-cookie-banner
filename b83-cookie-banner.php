@@ -3,7 +3,7 @@
  * Plugin Name:       b83 Cookie Banner
  * Plugin URI:        https://b83.at
  * Description:       DSGVO-konformer Cookie-Banner mit zwei Ebenen, Dienste-Katalog, Google Consent Mode v2, Blockieren von YouTube, Vimeo und Google Maps, Einwilligungsprotokoll und Mehrsprachigkeit (DE/EN).
- * Version:           7.1.0
+ * Version:           7.1.1
  * Requires at least: 6.2
  * Requires PHP:      8.1
  * Author:            b83 – Wolfgang Grabs-Schrempf
@@ -21,7 +21,7 @@ declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'B83_CB_VERSION', '7.1.0' );
+define( 'B83_CB_VERSION', '7.1.1' );
 define( 'B83_CB_FILE', __FILE__ );
 define( 'B83_CB_DIR', plugin_dir_path( __FILE__ ) );
 define( 'B83_CB_URL', plugin_dir_url( __FILE__ ) );

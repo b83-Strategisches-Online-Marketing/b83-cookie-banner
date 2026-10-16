@@ -1,5 +1,13 @@
 # Changelog
 
+## 7.1.1 – 2026-10-16
+
+### Behoben
+- Theme- bzw. Elementor-Stile (z. B. roter Rahmen, Unterstreichung, große Abstände) überschrieben die Buttons im Banner, den Einstellungs-Button am Bildschirmrand und den Button in Platzhaltern
+- „Details“-Knöpfe bei den Kategorien sind jetzt klein, ohne Unterstreichung und mit Pfeil
+- Einwilligungs-ID wurde in der Theme-Farbe für Code (oft rot) dargestellt
+- Überschrift und Links im Banner werden nicht mehr von Theme-Vorgaben verändert
+
 ## 7.1.0 – 2026-10-16
 
 ### Neu

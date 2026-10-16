@@ -305,7 +305,7 @@ final class AdminPage {
 		$texts = Settings::texts( 'de' );
 		echo '<div class="b83-cb-design__preview"><div class="b83-cb-design__sticky">';
 		echo '<h2>' . esc_html__( 'Vorschau', 'b83-cookie-banner' ) . '</h2>';
-		echo '<div class="b83-cb-preview-stage"><div class="b83-cb b83-cb--preview"><div class="b83-cb__dialog"><div class="b83-cb__view">';
+		echo '<div class="b83-cb-preview-stage"><div id="b83-cb" class="b83-cb b83-cb--preview"><div class="b83-cb__dialog"><div class="b83-cb__view">';
 		echo '<h2 class="b83-cb__title">' . esc_html( $texts['title'] ) . '</h2>';
 		echo '<div class="b83-cb__text">' . wp_kses( wpautop( wp_trim_words( $texts['message'], 28 ) ), Settings::message_html() + array( 'p' => array() ) ) . '</div>';
 		echo '<p class="b83-cb__links"><a href="#">Datenschutzerklärung</a> · <a href="#">Impressum</a></p>';
