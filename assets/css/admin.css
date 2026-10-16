@@ -15,3 +15,19 @@
 .b83-cb-stat strong { font-size: 18px; }
 .b83-cb-search { margin: 16px 0; }
 .b83-cb-list { list-style: disc; margin-left: 20px; }
+
+/* Tab „Design“ mit Live-Vorschau */
+.b83-cb-design { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 520px); gap: 24px; align-items: start; max-width: 1500px; }
+.b83-cb-design__fields .b83-cb-card { margin-top: 0; }
+.b83-cb-design__fields .form-table th { width: 180px; }
+.b83-cb-design__fields input[type="range"] { width: 220px; vertical-align: middle; }
+.b83-cb-design__fields output { display: inline-block; min-width: 56px; font-variant-numeric: tabular-nums; }
+.b83-cb-design__sticky { position: sticky; top: 46px; }
+.b83-cb-design__preview h2 { margin-top: 0; }
+.b83-cb-preview-stage { padding: 32px 20px; border-radius: 6px; border: 1px solid #c3c4c7; background: repeating-conic-gradient(#f0f0f1 0% 25%, #fff 0% 50%) 50% / 20px 20px; }
+.b83-cb.b83-cb--preview { position: relative !important; inset: auto !important; transform: none !important; z-index: 1 !important; max-height: none !important; width: min(var(--b83-cb-width), 100%) !important; margin: 0 auto; }
+@media (max-width: 1100px) {
+	.b83-cb-design { grid-template-columns: 1fr; }
+	.b83-cb-design__preview { order: -1; }
+	.b83-cb-design__sticky { position: static; }
+}

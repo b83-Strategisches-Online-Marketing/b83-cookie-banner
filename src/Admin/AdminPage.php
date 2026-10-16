@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace B83\CookieBanner\Admin;
 
 use B83\CookieBanner\ConsentLog;
+use B83\CookieBanner\Frontend\Design;
 use B83\CookieBanner\Migration;
 use B83\CookieBanner\Services;
 use B83\CookieBanner\Settings;
@@ -82,6 +83,11 @@ final class AdminPage {
 		}
 		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style( 'b83-cookie-banner-admin', B83_CB_URL . 'assets/css/admin.css', array(), B83_CB_VERSION );
+		if ( 'design' === $this->current_tab() ) {
+			// Echte Banner-Stile für die Vorschau, ohne eigenes CSS der Website.
+			wp_enqueue_style( 'b83-cookie-banner-preview', B83_CB_URL . 'assets/css/banner.css', array(), B83_CB_VERSION );
+			wp_add_inline_style( 'b83-cookie-banner-preview', Design::css( Settings::get(), false ) );
+		}
 		wp_enqueue_script( 'b83-cookie-banner-admin', B83_CB_URL . 'assets/js/admin.js', array( 'jquery', 'wp-color-picker' ), B83_CB_VERSION, true );
 		wp_localize_script(
 			'b83-cookie-banner-admin',
@@ -89,6 +95,9 @@ final class AdminPage {
 			array(
 				'confirmRevision' => __( 'Alle Besucher werden beim nächsten Besuch erneut um ihre Einwilligung gebeten. Fortfahren?', 'b83-cookie-banner' ),
 				'confirmRemove'   => __( 'Diesen Dienst entfernen?', 'b83-cookie-banner' ),
+				'shadows'         => Design::SHADOWS,
+				'fonts'           => Design::FONTS,
+				'pill'            => Design::PILL,
 			)
 		);
 	}
@@ -101,6 +110,7 @@ final class AdminPage {
 	private function tabs(): array {
 		return array(
 			'allgemein' => __( 'Allgemein', 'b83-cookie-banner' ),
+			'design'    => __( 'Design', 'b83-cookie-banner' ),
 			'texte'     => __( 'Texte', 'b83-cookie-banner' ),
 			'dienste'   => __( 'Dienste', 'b83-cookie-banner' ),
 			'protokoll' => __( 'Protokoll', 'b83-cookie-banner' ),
@@ -137,7 +147,7 @@ final class AdminPage {
 		}
 		echo '</nav>';
 
-		if ( in_array( $tab, array( 'allgemein', 'texte', 'dienste' ), true ) ) {
+		if ( in_array( $tab, array( 'allgemein', 'design', 'texte', 'dienste' ), true ) ) {
 			echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="b83-cb-form">';
 			echo '<input type="hidden" name="action" value="b83_cb_save"><input type="hidden" name="tab" value="' . esc_attr( $tab ) . '">';
 			wp_nonce_field( 'b83_cb_save', 'b83_cb_nonce' );
@@ -189,6 +199,35 @@ final class AdminPage {
 
 		$this->row_checkbox( 'enabled', __( 'Banner aktiv', 'b83-cookie-banner' ), $s['enabled'], __( 'Banner anzeigen und Dienste erst nach Zustimmung laden', 'b83-cookie-banner' ) );
 
+		$this->row_checkbox( 'show_reopen', __( 'Einstellungs-Symbol', 'b83-cookie-banner' ), $s['show_reopen'], __( 'Kleines Symbol am Bildschirmrand, über das Besucher ihre Auswahl jederzeit ändern können', 'b83-cookie-banner' ), __( 'Wenn ausgeschaltet: unbedingt den Shortcode [b83_cookie_settings] z. B. im Footer einbauen – der Widerruf muss so einfach sein wie die Zustimmung.', 'b83-cookie-banner' ) );
+
+		$this->row_checkbox( 'en_enabled', __( 'Englisch', 'b83-cookie-banner' ), $s['en_enabled'], __( 'Auf englischen Seiten (WPML, Polylang, TranslatePress) die englischen Texte verwenden', 'b83-cookie-banner' ) );
+
+		$this->row_number( 'lifetime_months', __( 'Gültigkeit der Einwilligung', 'b83-cookie-banner' ), $s['lifetime_months'], 1, 12, __( 'Monate. Danach wird erneut gefragt.', 'b83-cookie-banner' ) );
+		$this->row_number( 'log_retention_months', __( 'Aufbewahrung des Protokolls', 'b83-cookie-banner' ), $s['log_retention_months'], 6, 120, __( 'Monate. Ältere Einträge werden automatisch gelöscht.', 'b83-cookie-banner' ) );
+
+		echo '<tr><th scope="row">' . esc_html__( 'Banner-Version', 'b83-cookie-banner' ) . '</th><td>';
+		/* translators: %d: Versionsnummer */
+		echo '<p>' . esc_html( sprintf( __( 'Aktuell: %d', 'b83-cookie-banner' ), (int) $s['revision'] ) ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Wenn neue Dienste dazukommen oder sich Zwecke ändern, müssen alle Besucher erneut gefragt werden.', 'b83-cookie-banner' ) . '</p>';
+		echo '<p><a class="button b83-cb-new-revision" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=b83_cb_new_revision' ), 'b83_cb_new_revision' ) ) . '">' . esc_html__( 'Alle Besucher erneut fragen', 'b83-cookie-banner' ) . '</a></p>';
+		echo '</td></tr>';
+
+		echo '</tbody></table>';
+	}
+
+	/** @param array<string,mixed> $s Einstellungen. */
+	private function tab_design( array $s ): void {
+		$d      = $s['design'];
+		$issues = Design::contrast_issues( $s );
+		if ( $issues ) {
+			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'Schwer lesbar (Kontrast unter 4,5 : 1):', 'b83-cookie-banner' ) . ' ' . esc_html( implode( ', ', $issues ) ) . '</p></div>';
+		}
+
+		echo '<div class="b83-cb-design">';
+		echo '<div class="b83-cb-design__fields">';
+
+		echo '<div class="b83-cb-card"><h2>' . esc_html__( 'Allgemein', 'b83-cookie-banner' ) . '</h2><table class="form-table" role="presentation"><tbody>';
 		echo '<tr><th scope="row"><label for="b83-cb-position">' . esc_html__( 'Position', 'b83-cookie-banner' ) . '</label></th><td><select id="b83-cb-position" name="b83_cb[position]">';
 		foreach ( array(
 			'bottom_left'   => __( 'Unten links', 'b83-cookie-banner' ),
@@ -199,30 +238,115 @@ final class AdminPage {
 			echo '<option value="' . esc_attr( $value ) . '"' . selected( $s['position'], $value, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select></td></tr>';
+		echo '<tr><th scope="row"><label for="b83-cb-font">' . esc_html__( 'Schrift', 'b83-cookie-banner' ) . '</label></th><td><select id="b83-cb-font" name="b83_cb[design][font]" data-b83-design>';
+		foreach ( array(
+			'system'  => __( 'Systemschrift', 'b83-cookie-banner' ),
+			'inherit' => __( 'Schrift der Website übernehmen', 'b83-cookie-banner' ),
+		) as $value => $label ) {
+			echo '<option value="' . esc_attr( $value ) . '"' . selected( $d['font'], $value, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></td></tr>';
+		$this->color_row( 'b83_cb[accent_color]', __( 'Akzentfarbe', 'b83-cookie-banner' ), $s['accent_color'], '#d96f21', __( 'Links, Schalter und Standardfarbe der Buttons.', 'b83-cookie-banner' ) );
+		echo '</tbody></table></div>';
 
-		echo '<tr><th scope="row"><label for="b83-cb-accent">' . esc_html__( 'Akzentfarbe', 'b83-cookie-banner' ) . '</label></th><td>';
-		echo '<input type="text" id="b83-cb-accent" class="b83-cb-color" name="b83_cb[accent_color]" value="' . esc_attr( $s['accent_color'] ) . '" data-default-color="#d96f21">';
-		echo '<p class="description">' . esc_html__( 'Für Buttons und Links. Auf ausreichenden Kontrast zu weißer Schrift achten.', 'b83-cookie-banner' ) . '</p></td></tr>';
+		echo '<div class="b83-cb-card"><h2>' . esc_html__( 'Box', 'b83-cookie-banner' ) . '</h2><table class="form-table" role="presentation"><tbody>';
+		$this->color_row( 'b83_cb[design][box_bg]', __( 'Hintergrund', 'b83-cookie-banner' ), $d['box_bg'], '#ffffff' );
+		$this->color_row( 'b83_cb[design][box_text]', __( 'Textfarbe', 'b83-cookie-banner' ), $d['box_text'], '#1f2328' );
+		$this->color_row( 'b83_cb[design][box_border_color]', __( 'Rahmenfarbe', 'b83-cookie-banner' ), $d['box_border_color'], '#e1e4e8' );
+		$this->number_row( 'box_border_width', __( 'Rahmenstärke', 'b83-cookie-banner' ), $d, 'px' );
+		$this->number_row( 'box_radius', __( 'Eckenabrundung', 'b83-cookie-banner' ), $d, 'px' );
+		echo '<tr><th scope="row"><label for="b83-cb-shadow">' . esc_html__( 'Schatten', 'b83-cookie-banner' ) . '</label></th><td><select id="b83-cb-shadow" name="b83_cb[design][box_shadow]" data-b83-design>';
+		foreach ( array(
+			'none'   => __( 'Kein Schatten', 'b83-cookie-banner' ),
+			'light'  => __( 'Leicht', 'b83-cookie-banner' ),
+			'medium' => __( 'Mittel', 'b83-cookie-banner' ),
+			'strong' => __( 'Stark', 'b83-cookie-banner' ),
+		) as $value => $label ) {
+			echo '<option value="' . esc_attr( $value ) . '"' . selected( $d['box_shadow'], $value, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></td></tr>';
+		$this->number_row( 'box_width', __( 'Breite', 'b83-cookie-banner' ), $d, 'px', __( 'Auf dem Handy immer volle Breite.', 'b83-cookie-banner' ) );
+		$this->number_row( 'box_padding', __( 'Innenabstand', 'b83-cookie-banner' ), $d, 'px' );
+		echo '</tbody></table></div>';
 
-		$this->row_checkbox( 'show_reopen', __( 'Einstellungs-Symbol', 'b83-cookie-banner' ), $s['show_reopen'], __( 'Kleines Symbol am Bildschirmrand, über das Besucher ihre Auswahl jederzeit ändern können', 'b83-cookie-banner' ), __( 'Wenn ausgeschaltet: unbedingt den Shortcode [b83_cookie_settings] z. B. im Footer einbauen – der Widerruf muss so einfach sein wie die Zustimmung.', 'b83-cookie-banner' ) );
+		echo '<div class="b83-cb-card"><h2>' . esc_html__( 'Buttons „Alle akzeptieren“, „Alle ablehnen“, „Auswahl speichern“', 'b83-cookie-banner' ) . '</h2>';
+		echo '<p class="description">' . esc_html__( 'Diese Buttons teilen sich bewusst eine Gestaltung: Ablehnen muss genauso auffällig sein wie Zustimmen. Leere Farbfelder = automatisch aus der Akzentfarbe.', 'b83-cookie-banner' ) . '</p>';
+		echo '<table class="form-table" role="presentation"><tbody>';
+		$this->color_row( 'b83_cb[design][btn_bg]', __( 'Hintergrund', 'b83-cookie-banner' ), $d['btn_bg'], '' );
+		$this->color_row( 'b83_cb[design][btn_text]', __( 'Schriftfarbe', 'b83-cookie-banner' ), $d['btn_text'], '#ffffff' );
+		$this->color_row( 'b83_cb[design][btn_border]', __( 'Rahmenfarbe', 'b83-cookie-banner' ), $d['btn_border'], '' );
+		$this->color_row( 'b83_cb[design][btn_hover_bg]', __( 'Hintergrund (Hover)', 'b83-cookie-banner' ), $d['btn_hover_bg'], '' );
+		$this->color_row( 'b83_cb[design][btn_hover_text]', __( 'Schriftfarbe (Hover)', 'b83-cookie-banner' ), $d['btn_hover_text'], '#ffffff' );
+		$this->color_row( 'b83_cb[design][btn_hover_border]', __( 'Rahmenfarbe (Hover)', 'b83-cookie-banner' ), $d['btn_hover_border'], '' );
+		echo '</tbody></table></div>';
 
-		$this->row_checkbox( 'en_enabled', __( 'Englisch', 'b83-cookie-banner' ), $s['en_enabled'], __( 'Auf englischen Seiten (WPML, Polylang, TranslatePress) die englischen Texte verwenden', 'b83-cookie-banner' ) );
+		echo '<div class="b83-cb-card"><h2>' . esc_html__( 'Button „Einstellungen“', 'b83-cookie-banner' ) . '</h2><table class="form-table" role="presentation"><tbody>';
+		$this->color_row( 'b83_cb[design][btn2_bg]', __( 'Hintergrund', 'b83-cookie-banner' ), $d['btn2_bg'], '#ffffff' );
+		$this->color_row( 'b83_cb[design][btn2_text]', __( 'Schriftfarbe', 'b83-cookie-banner' ), $d['btn2_text'], '#1f2328' );
+		$this->color_row( 'b83_cb[design][btn2_border]', __( 'Rahmenfarbe', 'b83-cookie-banner' ), $d['btn2_border'], '#d0d7de' );
+		$this->color_row( 'b83_cb[design][btn2_hover_bg]', __( 'Hintergrund (Hover)', 'b83-cookie-banner' ), $d['btn2_hover_bg'], '#f3f4f6' );
+		$this->color_row( 'b83_cb[design][btn2_hover_text]', __( 'Schriftfarbe (Hover)', 'b83-cookie-banner' ), $d['btn2_hover_text'], '#1f2328' );
+		$this->color_row( 'b83_cb[design][btn2_hover_border]', __( 'Rahmenfarbe (Hover)', 'b83-cookie-banner' ), $d['btn2_hover_border'], '#afb8c1' );
+		echo '</tbody></table></div>';
 
-		$this->row_number( 'lifetime_months', __( 'Gültigkeit der Einwilligung', 'b83-cookie-banner' ), $s['lifetime_months'], 1, 12, __( 'Monate. Danach wird erneut gefragt.', 'b83-cookie-banner' ) );
-		$this->row_number( 'log_retention_months', __( 'Aufbewahrung des Protokolls', 'b83-cookie-banner' ), $s['log_retention_months'], 6, 120, __( 'Monate. Ältere Einträge werden automatisch gelöscht.', 'b83-cookie-banner' ) );
+		echo '<div class="b83-cb-card"><h2>' . esc_html__( 'Alle Buttons', 'b83-cookie-banner' ) . '</h2><table class="form-table" role="presentation"><tbody>';
+		/* translators: %d: Wert für vollständig runde Buttons */
+		$this->number_row( 'btn_radius', __( 'Abrundung', 'b83-cookie-banner' ), $d, 'px', sprintf( __( '%d = vollständig rund (Pillenform)', 'b83-cookie-banner' ), Design::PILL ) );
+		$this->number_row( 'btn_border_width', __( 'Rahmenstärke', 'b83-cookie-banner' ), $d, 'px' );
+		echo '</tbody></table></div>';
 
-		echo '<tr><th scope="row"><label for="b83-cb-css">' . esc_html__( 'Eigenes CSS', 'b83-cookie-banner' ) . '</label></th><td>';
-		echo '<textarea id="b83-cb-css" class="large-text code" rows="6" name="b83_cb[custom_css]">' . esc_textarea( $s['custom_css'] ) . '</textarea>';
-		echo '<p class="description">' . esc_html__( 'Nur CSS, ohne <style>-Tag. Zustimmen und Ablehnen müssen gleich auffällig bleiben.', 'b83-cookie-banner' ) . '</p></td></tr>';
+		echo '<div class="b83-cb-card"><h2>' . esc_html__( 'Eigenes CSS', 'b83-cookie-banner' ) . '</h2>';
+		echo '<textarea class="large-text code" rows="6" name="b83_cb[custom_css]" aria-label="' . esc_attr__( 'Eigenes CSS', 'b83-cookie-banner' ) . '">' . esc_textarea( $s['custom_css'] ) . '</textarea>';
+		echo '<p class="description">' . esc_html__( 'Nur für Sonderfälle, ohne <style>-Tag. Zustimmen und Ablehnen müssen gleich auffällig bleiben.', 'b83-cookie-banner' ) . '</p></div>';
 
-		echo '<tr><th scope="row">' . esc_html__( 'Banner-Version', 'b83-cookie-banner' ) . '</th><td>';
-		/* translators: %d: Versionsnummer */
-		echo '<p>' . esc_html( sprintf( __( 'Aktuell: %d', 'b83-cookie-banner' ), (int) $s['revision'] ) ) . '</p>';
-		echo '<p class="description">' . esc_html__( 'Wenn neue Dienste dazukommen oder sich Zwecke ändern, müssen alle Besucher erneut gefragt werden.', 'b83-cookie-banner' ) . '</p>';
-		echo '<p><a class="button b83-cb-new-revision" href="' . esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=b83_cb_new_revision' ), 'b83_cb_new_revision' ) ) . '">' . esc_html__( 'Alle Besucher erneut fragen', 'b83-cookie-banner' ) . '</a></p>';
-		echo '</td></tr>';
+		echo '</div>';
 
-		echo '</tbody></table>';
+		// Live-Vorschau mit den echten Banner-Stilen.
+		$texts = Settings::texts( 'de' );
+		echo '<div class="b83-cb-design__preview"><div class="b83-cb-design__sticky">';
+		echo '<h2>' . esc_html__( 'Vorschau', 'b83-cookie-banner' ) . '</h2>';
+		echo '<div class="b83-cb-preview-stage"><div class="b83-cb b83-cb--preview"><div class="b83-cb__dialog"><div class="b83-cb__view">';
+		echo '<h2 class="b83-cb__title">' . esc_html( $texts['title'] ) . '</h2>';
+		echo '<div class="b83-cb__text">' . wp_kses( wpautop( wp_trim_words( $texts['message'], 28 ) ), Settings::message_html() + array( 'p' => array() ) ) . '</div>';
+		echo '<p class="b83-cb__links"><a href="#">Datenschutzerklärung</a> · <a href="#">Impressum</a></p>';
+		echo '<div class="b83-cb__actions">';
+		echo '<button type="button" class="b83-cb__btn b83-cb__btn--choice">Alle akzeptieren</button>';
+		echo '<button type="button" class="b83-cb__btn b83-cb__btn--choice">Alle ablehnen</button>';
+		echo '<button type="button" class="b83-cb__btn b83-cb__btn--secondary">Einstellungen</button>';
+		echo '</div></div></div></div></div>';
+		echo '<p class="description">' . esc_html__( 'Mit der Maus über die Buttons fahren, um die Hover-Farben zu sehen. Änderungen werden erst mit „Speichern“ übernommen.', 'b83-cookie-banner' ) . '</p>';
+		echo '</div></div>';
+
+		echo '</div>';
+	}
+
+	private function color_row( string $name, string $label, string $value, string $default, string $hint = '' ): void {
+		$auto = '' === $default;
+		printf(
+			'<tr><th scope="row">%1$s</th><td><input type="text" class="b83-cb-color" name="%2$s" value="%3$s" data-default-color="%4$s" data-b83-design aria-label="%1$s">%5$s</td></tr>',
+			esc_html( $label ),
+			esc_attr( $name ),
+			esc_attr( $value ),
+			esc_attr( $default ),
+			( $auto || '' !== $hint ) ? '<p class="description">' . esc_html( $auto ? __( 'Leer = automatisch', 'b83-cookie-banner' ) . ( '' !== $hint ? ' – ' . $hint : '' ) : $hint ) . '</p>' : ''
+		);
+	}
+
+	/**
+	 * @param array<string,mixed> $d Design-Einstellungen.
+	 */
+	private function number_row( string $key, string $label, array $d, string $unit, string $hint = '' ): void {
+		[ $min, $max ] = Settings::DESIGN_NUMBERS[ $key ];
+		printf(
+			'<tr><th scope="row"><label for="b83-cb-%1$s">%2$s</label></th><td><input type="range" id="b83-cb-%1$s" min="%3$d" max="%4$d" value="%5$d" name="b83_cb[design][%1$s]" data-b83-design data-unit="%6$s"> <output for="b83-cb-%1$s">%5$d %6$s</output>%7$s</td></tr>',
+			esc_attr( $key ),
+			esc_html( $label ),
+			$min,
+			$max,
+			(int) $d[ $key ],
+			esc_html( $unit ),
+			'' !== $hint ? '<p class="description">' . esc_html( $hint ) . '</p>' : ''
+		);
 	}
 
 	/** @param array<string,mixed> $s Einstellungen. */
@@ -510,10 +634,19 @@ final class AdminPage {
 	 */
 	public static function merge( array $current, array $post, string $tab, bool $allow_code ): array {
 		if ( 'allgemein' === $tab ) {
-			foreach ( array( 'enabled', 'position', 'accent_color', 'show_reopen', 'en_enabled', 'lifetime_months', 'log_retention_months', 'custom_css' ) as $key ) {
+			foreach ( array( 'enabled', 'show_reopen', 'en_enabled', 'lifetime_months', 'log_retention_months' ) as $key ) {
 				if ( array_key_exists( $key, $post ) ) {
 					$current[ $key ] = $post[ $key ];
 				}
+			}
+		} elseif ( 'design' === $tab ) {
+			foreach ( array( 'position', 'accent_color', 'custom_css' ) as $key ) {
+				if ( array_key_exists( $key, $post ) ) {
+					$current[ $key ] = $post[ $key ];
+				}
+			}
+			if ( is_array( $post['design'] ?? null ) ) {
+				$current['design'] = $post['design'];
 			}
 		} elseif ( 'texte' === $tab && is_array( $post['texts'] ?? null ) ) {
 			$current['texts'] = $post['texts'];

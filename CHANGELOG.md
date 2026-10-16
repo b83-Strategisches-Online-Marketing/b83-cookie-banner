@@ -1,5 +1,17 @@
 # Changelog
 
+## 7.1.0 – 2026-10-16
+
+### Neu
+- Tab „Design“ mit Live-Vorschau
+- Box: Hintergrund, Textfarbe, Rahmenfarbe und -stärke, Eckenabrundung, Schatten (keiner bis stark), Breite, Innenabstand
+- Buttons: Hintergrund, Schrift- und Rahmenfarbe jeweils normal und beim Überfahren, Abrundung (bis Pillenform), Rahmenstärke – getrennt für „Zustimmen/Ablehnen/Speichern“ und „Einstellungen“
+- Schrift der Website übernehmen oder Systemschrift
+- Warnung bei schwer lesbaren Farbkombinationen (Kontrast unter 4,5 : 1)
+
+### Geändert
+- Position, Akzentfarbe und eigenes CSS liegen jetzt im Tab „Design“
+
 ## 7.0.0 – 2026-10-15
 
 Neuaufbau nach b83-Standard.

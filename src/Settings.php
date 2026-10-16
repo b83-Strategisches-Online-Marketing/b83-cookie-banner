@@ -120,7 +120,83 @@ final class Settings {
 				'google_maps' => array( 'enabled' => true ),
 			),
 			'custom'               => array(),
+			'design'               => self::design_defaults(),
 		);
+	}
+
+	/**
+	 * Gestaltung. Leere Button-Farben bedeuten „automatisch“ (Akzentfarbe bzw. abgedunkelt).
+	 *
+	 * @return array<string,mixed>
+	 */
+	public static function design_defaults(): array {
+		return array(
+			'box_bg'            => '#ffffff',
+			'box_text'          => '#1f2328',
+			'box_border_color'  => '#e1e4e8',
+			'box_border_width'  => 1,
+			'box_radius'        => 16,
+			'box_shadow'        => 'medium',
+			'box_width'         => 460,
+			'box_padding'       => 20,
+			'font'              => 'system',
+			'btn_bg'            => '',
+			'btn_text'          => '#ffffff',
+			'btn_border'        => '',
+			'btn_hover_bg'      => '',
+			'btn_hover_text'    => '#ffffff',
+			'btn_hover_border'  => '',
+			'btn2_bg'           => '#ffffff',
+			'btn2_text'         => '#1f2328',
+			'btn2_border'       => '#d0d7de',
+			'btn2_hover_bg'     => '#f3f4f6',
+			'btn2_hover_text'   => '#1f2328',
+			'btn2_hover_border' => '#afb8c1',
+			'btn_radius'        => 30,
+			'btn_border_width'  => 2,
+		);
+	}
+
+	/** Felder, die leer bleiben dürfen (= automatisch). */
+	public const AUTO_COLORS = array( 'btn_bg', 'btn_border', 'btn_hover_bg', 'btn_hover_border' );
+
+	/** Zahlenfelder: Feld => [min, max]. */
+	public const DESIGN_NUMBERS = array(
+		'box_border_width' => array( 0, 6 ),
+		'box_radius'       => array( 0, 40 ),
+		'box_width'        => array( 320, 800 ),
+		'box_padding'      => array( 8, 40 ),
+		'btn_radius'       => array( 0, 30 ),
+		'btn_border_width' => array( 0, 4 ),
+	);
+
+	/**
+	 * @param mixed $raw Rohdaten.
+	 * @return array<string,mixed>
+	 */
+	private static function sanitize_design( $raw ): array {
+		$raw   = is_array( $raw ) ? $raw : array();
+		$d     = self::design_defaults();
+		$clean = array();
+		foreach ( $d as $key => $default ) {
+			$value = $raw[ $key ] ?? $default;
+			if ( isset( self::DESIGN_NUMBERS[ $key ] ) ) {
+				[ $min, $max ]  = self::DESIGN_NUMBERS[ $key ];
+				$clean[ $key ] = is_numeric( $value ) ? max( $min, min( $max, (int) $value ) ) : $default;
+			} elseif ( 'box_shadow' === $key ) {
+				$clean[ $key ] = is_string( $value ) && array_key_exists( $value, Frontend\Design::SHADOWS ) ? $value : $default;
+			} elseif ( 'font' === $key ) {
+				$clean[ $key ] = is_string( $value ) && array_key_exists( $value, Frontend\Design::FONTS ) ? $value : $default;
+			} else {
+				$color = is_string( $value ) ? sanitize_hex_color( strtolower( trim( $value ) ) ) : null;
+				if ( $color ) {
+					$clean[ $key ] = $color;
+				} else {
+					$clean[ $key ] = in_array( $key, self::AUTO_COLORS, true ) && '' === trim( (string) ( is_scalar( $value ) ? $value : '' ) ) ? '' : $default;
+				}
+			}
+		}
+		return $clean;
 	}
 
 	/**
@@ -150,6 +226,7 @@ final class Settings {
 			'texts'                => array(),
 			'services'             => array(),
 			'custom'               => array(),
+			'design'               => self::sanitize_design( $raw['design'] ?? array() ),
 		);
 
 		foreach ( array( 'de', 'en' ) as $lang ) {

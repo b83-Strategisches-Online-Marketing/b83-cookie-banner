@@ -4,7 +4,7 @@ Cookie-Banner für WordPress mit Fokus auf DSGVO, österreichischem TKG 2021 und
 
 Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgang Grabs-Schrempf, office@b83.at.
 
-- **Version:** 7.0.0
+- **Version:** 7.1.0
 - **Voraussetzungen:** WordPress 6.2+, PHP 8.1+
 - **Lizenz:** GPL-2.0-or-later
 
@@ -21,6 +21,7 @@ Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgan
 - **Einwilligungsprotokoll** in eigener Tabelle: Einwilligungs-ID, Zeitpunkt, Auswahl, Banner-Version, Sprache, Seite – keine IP-Adresse. CSV-Export, Suche nach ID, automatische Löschung nach einstellbarer Frist.
 - **Cache-sicher:** Funktioniert mit WP Rocket und anderen Seiten-Caches; Ausnahmen für WP Rocket werden automatisch gesetzt, der Seiten-Cache wird nach dem Speichern geleert.
 - **Deutsch und Englisch:** Englische Texte für Seiten in englischer Sprache (WPML, Polylang, TranslatePress).
+- **Gestaltung** im Tab „Design“ mit Live-Vorschau: Farben, Rahmen, Abrundungen, Schatten, Breite und Abstände für Box und Buttons, inkl. Hover-Farben und Kontrastwarnung.
 - **Neue Abfrage** aller Besucher per Knopfdruck, wenn sich Dienste oder Zwecke ändern.
 
 ## Shortcodes
@@ -71,7 +72,7 @@ src/
   Migration.php              Installation, Übernahme aus 6.x
   Updater.php                Updates über GitHub-Releases
   Rest/ConsentEndpoint.php   Protokoll-Endpunkt (öffentlich, validiert, begrenzt)
-  Frontend/                  Banner, Consent Mode, Blockieren, Texte
+  Frontend/                  Banner, Consent Mode, Blockieren, Texte, Design (CSS-Variablen)
   Admin/                     Backend und gemeinsames b83-Menü
 assets/                      CSS, JS, Logo
 ```

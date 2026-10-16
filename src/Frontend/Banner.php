@@ -96,11 +96,7 @@ final class Banner {
 		$lang     = Settings::lang();
 
 		wp_enqueue_style( 'b83-cookie-banner', B83_CB_URL . 'assets/css/banner.css', array(), B83_CB_VERSION );
-		$css = ':root{--b83-cb-accent:' . $settings['accent_color'] . ';}';
-		if ( '' !== $settings['custom_css'] ) {
-			$css .= "\n" . $settings['custom_css'];
-		}
-		wp_add_inline_style( 'b83-cookie-banner', $css );
+		wp_add_inline_style( 'b83-cookie-banner', Design::css( $settings ) );
 
 		wp_enqueue_script( 'b83-cookie-banner', B83_CB_URL . 'assets/js/banner.js', array(), B83_CB_VERSION, array( 'in_footer' => true ) );
 
