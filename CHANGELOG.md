@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.3.1 – 2026-11-01
+
+### Behoben
+- Elementor-Video-Widgets wurden doppelt blockiert (Widget-Filter und the_content): Nach „Inhalt laden“ erschien ein zweiter Platzhalter, der sich nicht mehr öffnen ließ
+- „Inhalt laden“ öffnet Platzhalter jetzt auch, wenn der Dienst auf der Seite schon geladen ist, etwa in später geöffneten Popups oder Tabs
+
 ## 7.3.0 – 2026-11-01
 
 ### Neu

@@ -179,31 +179,41 @@
 	};
 
 	function unblock(id) {
-		document.querySelectorAll('[data-b83-blocked="' + id + '"]').forEach(function (box) {
-			var tpl = box.querySelector("template.b83-cb-blocked__embed");
-			if (!tpl) return;
-			var frag = tpl.content ? tpl.content.cloneNode(true) : document.createRange().createContextualFragment(tpl.innerHTML);
-			box.innerHTML = "";
-			box.appendChild(frag);
-			// Hat ein Lazy-Load-Plugin das iFrame umgeschrieben (src = about:blank), echte Adresse einsetzen.
-			box.querySelectorAll("iframe[data-lazy-src], iframe[data-src]").forEach(function (f) {
-				var real = f.getAttribute("data-lazy-src") || f.getAttribute("data-src");
-				var cur = f.getAttribute("src") || "";
-				if (real && (cur === "" || cur === "about:blank" || cur.indexOf("data:") === 0)) f.setAttribute("src", real);
-			});
-			box.classList.add("is-loaded");
-			box.removeAttribute("data-b83-blocked");
+		// Mehrfach durchlaufen: Ältere, zwischengespeicherte Seiten können einen
+		// Platzhalter im Platzhalter enthalten; der innere wird dann gleich mit geöffnet.
+		for (var round = 0; round < 3; round++) {
+			var boxes = document.querySelectorAll('[data-b83-blocked="' + id + '"]');
+			if (!boxes.length) return;
+			boxes.forEach(openBox);
+		}
+	}
+
+	function openBox(box) {
+		var tpl = box.querySelector("template.b83-cb-blocked__embed");
+		if (!tpl) return;
+		var frag = tpl.content ? tpl.content.cloneNode(true) : document.createRange().createContextualFragment(tpl.innerHTML);
+		box.innerHTML = "";
+		box.appendChild(frag);
+		// Hat ein Lazy-Load-Plugin das iFrame umgeschrieben (src = about:blank), echte Adresse einsetzen.
+		box.querySelectorAll("iframe[data-lazy-src], iframe[data-src]").forEach(function (f) {
+			var real = f.getAttribute("data-lazy-src") || f.getAttribute("data-src");
+			var cur = f.getAttribute("src") || "";
+			if (real && (cur === "" || cur === "about:blank" || cur.indexOf("data:") === 0)) f.setAttribute("src", real);
 		});
+		box.classList.add("is-loaded");
+		box.removeAttribute("data-b83-blocked");
 	}
 
 	function apply(list) {
 		updateConsentMode(list);
 		list.forEach(function (id) {
-			if (loaded[id] || !services[id]) return;
+			if (!services[id]) return;
+			// Platzhalter immer öffnen, auch später nachgeladene (Popups, Tabs, AJAX).
+			unblock(id);
+			if (loaded[id]) return;
 			loaded[id] = true;
 			if (loaders[id]) loaders[id](services[id].config || {});
 			if (cfg.code && cfg.code[id]) injectHtml(cfg.code[id]);
-			unblock(id);
 		});
 		window.dataLayer = window.dataLayer || [];
 		window.dataLayer.push({ event: "b83_consent", b83_services: list.slice() });

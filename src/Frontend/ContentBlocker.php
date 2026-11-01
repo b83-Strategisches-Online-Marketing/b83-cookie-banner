@@ -71,6 +71,11 @@ final class ContentBlocker {
 	 * @param array<int,string> $m Treffer.
 	 */
 	private function replace_iframe( array $m ): string {
+		// Schon blockiert (steckt in einem Platzhalter): nicht noch einmal einpacken.
+		// Elementor-Inhalte laufen sonst zweimal durch – Widget-Filter und the_content.
+		if ( false !== stripos( $m[0], 'data-b83-cb-embed' ) ) {
+			return $m[0];
+		}
 		$src     = html_entity_decode( $m[2], ENT_QUOTES );
 		$service = Services::match_url( $src, $this->active() );
 		if ( null === $service ) {
@@ -206,15 +211,15 @@ final class ContentBlocker {
 	}
 
 	/**
-	 * Lazy-Load-Plugins (WP Rocket, LiteSpeed, Autoptimize …) vom iFrame im
-	 * Template fernhalten: Sie ersetzen sonst src durch about:blank, und das
-	 * Video bleibt nach der Zustimmung leer.
+	 * iFrame im Template markieren: data-b83-cb-embed verhindert doppeltes
+	 * Blockieren, data-no-lazy hält Lazy-Load-Plugins (WP Rocket, LiteSpeed,
+	 * Autoptimize …) fern, die sonst src durch about:blank ersetzen.
 	 */
 	private static function no_lazy( string $iframe ): string {
-		if ( false !== stripos( $iframe, 'data-no-lazy' ) ) {
+		if ( false !== stripos( $iframe, 'data-b83-cb-embed' ) ) {
 			return $iframe;
 		}
-		return (string) preg_replace( '/^<iframe\b/i', '<iframe data-no-lazy="1" data-skip-lazy="1"', $iframe, 1 );
+		return (string) preg_replace( '/^<iframe\b/i', '<iframe data-b83-cb-embed="1" data-no-lazy="1" data-skip-lazy="1"', $iframe, 1 );
 	}
 
 	private function placeholder( string $service_id, string $iframe, string $ratio ): string {
