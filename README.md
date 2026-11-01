@@ -1,10 +1,12 @@
+![](assets/img/banner-772x250.png)
+
 # b83 Cookie Banner
 
 Cookie-Banner für WordPress mit Fokus auf DSGVO, österreichischem TKG 2021 und den Leitlinien der europäischen Datenschutzbehörden.
 
 Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgang Grabs-Schrempf, office@b83.at.
 
-- **Version:** 7.1.1
+- **Version:** 7.2.0
 - **Voraussetzungen:** WordPress 6.2+, PHP 8.1+
 - **Lizenz:** GPL-2.0-or-later
 

@@ -67,6 +67,8 @@ final class Updater {
 			'package'      => $release['package'],
 			'requires_php' => '8.1',
 			'requires'     => '6.2',
+			'icons'        => $this->icons(),
+			'banners'      => $this->banners(),
 		);
 	}
 
@@ -97,8 +99,11 @@ final class Updater {
 			'requires_php'  => '8.1',
 			'last_updated'  => $release['published'],
 			'download_link' => $release['package'],
+			'icons'         => $this->icons(),
+			'banners'       => $this->banners(),
 			'sections'      => array(
-				'changelog' => $release['notes'],
+				'description' => $this->description(),
+				'changelog'   => $release['notes'],
 			),
 		);
 	}
@@ -148,6 +153,51 @@ final class Updater {
 		);
 		set_transient( self::TRANSIENT, $release, 6 * HOUR_IN_SECONDS );
 		return $release;
+	}
+
+	/**
+	 * Icons für die Update-Liste und „Details ansehen“.
+	 *
+	 * @return array<string,string>
+	 */
+	private function icons(): array {
+		$url = plugin_dir_url( B83_CB_FILE ) . 'assets/img/';
+		return array(
+			'1x'  => $url . 'icon-128x128.png',
+			'2x'  => $url . 'icon-256x256.png',
+			'svg' => $url . 'icon.svg',
+		);
+	}
+
+	/**
+	 * Banner für „Details ansehen“.
+	 *
+	 * @return array<string,string>
+	 */
+	private function banners(): array {
+		$url = plugin_dir_url( B83_CB_FILE ) . 'assets/img/';
+		return array(
+			'low'  => $url . 'banner-772x250.png',
+			'high' => $url . 'banner-1544x500.png',
+		);
+	}
+
+	/** Beschreibung für „Details ansehen“. */
+	private function description(): string {
+		$html = '';
+		$html .= '<p>' . esc_html__( 'Cookie-Banner für Websites in Österreich und der EU. Auf der ersten Ebene wählen Besucher „Alle akzeptieren“, „Alle ablehnen“ oder „Einstellungen“, auf der zweiten entscheiden sie je Kategorie und Dienst.', 'b83-cookie-banner' ) . '</p>';
+		$html .= '<p>' . esc_html__( 'Google Analytics, Tag Manager, Meta Pixel sowie eingebettete Videos und Karten lädt der Banner erst nach der Zustimmung. Jede Entscheidung landet mit einer Einwilligungs-ID im Protokoll, ohne IP-Adresse.', 'b83-cookie-banner' ) . '</p>';
+		$html .= '<ul>';
+		$html .= '<li>' . esc_html__( 'Dienste-Katalog mit Anbieter, Zweck, Cookies, Drittland und Datenschutzlink, dazu eigene Dienste', 'b83-cookie-banner' ) . '</li>';
+		$html .= '<li>' . esc_html__( 'Google Consent Mode v2', 'b83-cookie-banner' ) . '</li>';
+		$html .= '<li>' . esc_html__( 'Platzhalter für YouTube, Vimeo und Google Maps in Beiträgen, Widgets und Elementor', 'b83-cookie-banner' ) . '</li>';
+		$html .= '<li>' . esc_html__( 'Einwilligungsprotokoll mit CSV-Export und automatischer Löschung', 'b83-cookie-banner' ) . '</li>';
+		$html .= '<li>' . esc_html__( 'Gestaltung mit Live-Vorschau, Texte auf Deutsch und Englisch', 'b83-cookie-banner' ) . '</li>';
+		$html .= '<li>' . esc_html__( 'Läuft mit WP Rocket und anderen Seiten-Caches', 'b83-cookie-banner' ) . '</li>';
+		$html .= '</ul>';
+		$html .= '<p>' . esc_html__( 'Der Banner hilft bei einer rechtskonformen Umsetzung, ersetzt aber keine Rechtsberatung.', 'b83-cookie-banner' ) . '</p>';
+		$html .= '<p>' . esc_html__( 'Ein Plugin von b83 – Strategisches Online Marketing.', 'b83-cookie-banner' ) . ' <a href="https://b83.at">b83.at</a></p>';
+		return $html;
 	}
 
 	/* ---------------------------------------------------------------------
