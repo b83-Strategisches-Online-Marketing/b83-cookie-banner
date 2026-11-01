@@ -185,7 +185,7 @@ body .b83-cb-blocked .b83-cb-blocked__btn:focus-visible {
 	appearance: none;
 	position: fixed;
 	z-index: 2147482999;
-	bottom: 16px;
+	bottom: var(--b83-cb-reopen-bottom, 16px);
 	left: 16px;
 	width: 44px;
 	height: 44px;
@@ -209,7 +209,60 @@ body .b83-cb-blocked .b83-cb-blocked__btn:focus-visible {
 #b83-cb-reopen:hover { background: var(--b83-cb-soft); }
 #b83-cb-reopen svg { width: 22px; height: 22px; fill: currentColor; }
 #b83-cb-reopen[hidden] { display: none; }
-#b83-cb-reopen.b83-cb-reopen--bottom_right { left: auto; right: 16px; }
+#b83-cb-reopen .b83-cb-reopen__label { display: none; }
+#b83-cb-reopen.b83-cb-reopen--side-right { left: auto; right: 16px; }
+
+/* Einstellungs-Button als schmaler Reiter am Bildschirmrand: zeigt beim
+   Überfahren oder per Tastatur den Text „Cookie-Einstellungen“. */
+#b83-cb-reopen.b83-cb-reopen--tab,
+#b83-cb-reopen.b83-cb-reopen--tab:hover,
+#b83-cb-reopen.b83-cb-reopen--tab:focus,
+#b83-cb-reopen.b83-cb-reopen--tab:active {
+	top: var(--b83-cb-reopen-y, 70%);
+	bottom: auto;
+	left: 0;
+	right: auto;
+	width: auto;
+	height: 40px;
+	padding: 0 10px 0 8px;
+	border-radius: 0 10px 10px 0;
+	border-left-width: 0;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .16);
+	transform: translateY(-50%);
+}
+#b83-cb-reopen.b83-cb-reopen--tab.b83-cb-reopen--side-right,
+#b83-cb-reopen.b83-cb-reopen--tab.b83-cb-reopen--side-right:hover,
+#b83-cb-reopen.b83-cb-reopen--tab.b83-cb-reopen--side-right:focus,
+#b83-cb-reopen.b83-cb-reopen--tab.b83-cb-reopen--side-right:active {
+	left: auto;
+	right: 0;
+	padding: 0 8px 0 10px;
+	border-radius: 10px 0 0 10px;
+	border-left-width: var(--b83-cb-border-w);
+	border-right-width: 0;
+	flex-direction: row-reverse;
+}
+#b83-cb-reopen.b83-cb-reopen--tab svg { width: 20px; height: 20px; flex: none; }
+#b83-cb-reopen.b83-cb-reopen--tab .b83-cb-reopen__label {
+	display: block;
+	max-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	opacity: 0;
+	color: var(--b83-cb-text);
+	font-family: var(--b83-cb-font);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1;
+	transition: max-width .25s ease, opacity .2s ease, margin .25s ease;
+}
+#b83-cb-reopen.b83-cb-reopen--tab:hover .b83-cb-reopen__label,
+#b83-cb-reopen.b83-cb-reopen--tab:focus-visible .b83-cb-reopen__label { max-width: 240px; opacity: 1; margin-left: 8px; }
+#b83-cb-reopen.b83-cb-reopen--tab.b83-cb-reopen--side-right:hover .b83-cb-reopen__label,
+#b83-cb-reopen.b83-cb-reopen--tab.b83-cb-reopen--side-right:focus-visible .b83-cb-reopen__label { margin-left: 0; margin-right: 8px; }
+@media (prefers-reduced-motion: reduce) {
+	#b83-cb-reopen .b83-cb-reopen__label { transition: none; }
+}
 body button.b83-cookie-reopen-link, body button.b83-cookie-reopen-link:hover, body button.b83-cookie-reopen-link:focus { appearance: none; background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; margin: 0; min-height: 0; font: inherit; color: inherit; text-decoration: underline; text-transform: none; letter-spacing: inherit; cursor: pointer; }
 
 /* Platzhalter für blockierte Inhalte */

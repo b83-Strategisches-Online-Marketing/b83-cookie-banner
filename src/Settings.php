@@ -125,6 +125,19 @@ final class Settings {
 	}
 
 	/**
+	 * Seite, auf der der Einstellungs-Button tatsächlich erscheint.
+	 *
+	 * @param array<string,mixed> $settings Bereinigte Einstellungen.
+	 */
+	public static function reopen_side( array $settings ): string {
+		$side = (string) ( $settings['design']['reopen_side'] ?? 'auto' );
+		if ( 'auto' === $side ) {
+			return 'bottom_right' === $settings['position'] ? 'right' : 'left';
+		}
+		return $side;
+	}
+
+	/**
 	 * Gestaltung. Leere Button-Farben bedeuten „automatisch“ (Akzentfarbe bzw. abgedunkelt).
 	 *
 	 * @return array<string,mixed>
@@ -154,8 +167,18 @@ final class Settings {
 			'btn2_hover_border' => '#afb8c1',
 			'btn_radius'        => 30,
 			'btn_border_width'  => 2,
+			'reopen_style'      => 'round',
+			'reopen_side'       => 'auto',
+			'reopen_bottom'     => 16,
+			'reopen_tab_y'      => 70,
 		);
 	}
+
+	/** Einstellungs-Button: rundes Symbol in der Ecke oder schmaler Reiter am Rand. */
+	public const REOPEN_STYLES = array( 'round', 'tab' );
+
+	/** Seite des Einstellungs-Buttons; „auto“ folgt der Banner-Position (bisheriges Verhalten). */
+	public const REOPEN_SIDES = array( 'auto', 'left', 'right' );
 
 	/** Felder, die leer bleiben dürfen (= automatisch). */
 	public const AUTO_COLORS = array( 'btn_bg', 'btn_border', 'btn_hover_bg', 'btn_hover_border' );
@@ -168,6 +191,8 @@ final class Settings {
 		'box_padding'      => array( 8, 40 ),
 		'btn_radius'       => array( 0, 30 ),
 		'btn_border_width' => array( 0, 4 ),
+		'reopen_bottom'    => array( 8, 400 ),
+		'reopen_tab_y'     => array( 10, 90 ),
 	);
 
 	/**
@@ -183,6 +208,10 @@ final class Settings {
 			if ( isset( self::DESIGN_NUMBERS[ $key ] ) ) {
 				[ $min, $max ]  = self::DESIGN_NUMBERS[ $key ];
 				$clean[ $key ] = is_numeric( $value ) ? max( $min, min( $max, (int) $value ) ) : $default;
+			} elseif ( 'reopen_style' === $key ) {
+				$clean[ $key ] = is_string( $value ) && in_array( $value, self::REOPEN_STYLES, true ) ? $value : $default;
+			} elseif ( 'reopen_side' === $key ) {
+				$clean[ $key ] = is_string( $value ) && in_array( $value, self::REOPEN_SIDES, true ) ? $value : $default;
 			} elseif ( 'box_shadow' === $key ) {
 				$clean[ $key ] = is_string( $value ) && array_key_exists( $value, Frontend\Design::SHADOWS ) ? $value : $default;
 			} elseif ( 'font' === $key ) {

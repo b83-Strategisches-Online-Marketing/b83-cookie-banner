@@ -1,5 +1,15 @@
 # Changelog
 
+## 7.4.0 – 2026-11-01
+
+### Neu
+- Einstellungs-Button frei platzierbar (Tab „Design“): rundes Symbol in der Ecke oder schmaler Reiter am Rand, der beim Überfahren „Cookie-Einstellungen“ zeigt
+- Seite (links, rechts oder wie der Banner) unabhängig von der Banner-Position, dazu Abstand unten bzw. Höhe am Rand
+- Vorschau des Einstellungs-Buttons im Tab „Design“, mit angedeutetem „Nach oben“-Button
+
+### Geändert
+- Bestehende Websites behalten das bisherige Verhalten (rundes Symbol, Seite wie der Banner)
+
 ## 7.3.2 – 2026-11-01
 
 ### Behoben

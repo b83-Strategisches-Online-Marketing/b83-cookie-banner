@@ -77,6 +77,8 @@ final class Design {
 			'btn2-hbg'     => (string) $d['btn2_hover_bg'],
 			'btn2-htext'   => (string) $d['btn2_hover_text'],
 			'btn2-hborder' => (string) $d['btn2_hover_border'],
+			'reopen-bottom' => $px( $d['reopen_bottom'] ),
+			'reopen-y'      => (int) $d['reopen_tab_y'] . '%',
 		);
 	}
 

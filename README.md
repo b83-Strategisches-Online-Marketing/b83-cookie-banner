@@ -6,7 +6,7 @@ Cookie-Banner für WordPress mit Fokus auf DSGVO, österreichischem TKG 2021 und
 
 Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgang Grabs-Schrempf, office@b83.at.
 
-- **Version:** 7.3.2
+- **Version:** 7.4.0
 - **Voraussetzungen:** WordPress 6.2+, PHP 8.1+
 - **Lizenz:** GPL-2.0-or-later
 
@@ -19,7 +19,7 @@ Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgan
 - **Dienste-Katalog:** Google Tag Manager, Google Analytics, Meta Pixel, YouTube, Vimeo, Google Maps – plus eigene Dienste (z. B. Wetter-Widgets) mit Skript-Code und Domains zum Blockieren.
 - **Google Consent Mode v2:** Standardmäßig alles verweigert, Aktualisierung nach Zustimmung.
 - **Blockieren eingebetteter Inhalte** (YouTube, Vimeo, Google Maps, eigene Domains) in Beiträgen, oEmbeds, Widgets und allen Elementor-Widgets – mit Platzhalter und Zustimmung je Dienst. YouTube wird über youtube-nocookie.com, Vimeo mit „Do Not Track“ geladen.
-- **Widerruf** jederzeit über ein Symbol oder den Shortcode; abgewählte Dienste werden sofort gestoppt, ihre Cookies gelöscht.
+- **Widerruf** jederzeit über den Einstellungs-Button oder den Shortcode; abgewählte Dienste werden sofort gestoppt, ihre Cookies gelöscht. Der Button erscheint als rundes Symbol in der Ecke oder als schmaler Reiter am linken oder rechten Rand, unabhängig von der Position des Banners.
 - **Einwilligungsprotokoll** in eigener Tabelle: Einwilligungs-ID, Zeitpunkt, Auswahl, Banner-Version, Sprache, Seite – keine IP-Adresse. CSV-Export, Suche nach ID, automatische Löschung nach einstellbarer Frist.
 - **Cache-sicher:** Funktioniert mit WP Rocket und anderen Seiten-Caches; Ausnahmen für WP Rocket werden automatisch gesetzt, der Seiten-Cache wird nach dem Speichern geleert.
 - **Deutsch und Englisch:** Englische Texte für Seiten in englischer Sprache (WPML, Polylang, TranslatePress).

@@ -13,6 +13,7 @@ namespace B83\CookieBanner\Admin;
 
 use B83\CookieBanner\ConsentLog;
 use B83\CookieBanner\Frontend\Design;
+use B83\CookieBanner\Frontend\Texts;
 use B83\CookieBanner\Migration;
 use B83\CookieBanner\Services;
 use B83\CookieBanner\Settings;
@@ -295,6 +296,30 @@ final class AdminPage {
 		$this->number_row( 'btn_border_width', __( 'Rahmenstärke', 'b83-cookie-banner' ), $d, 'px' );
 		echo '</tbody></table></div>';
 
+		echo '<div class="b83-cb-card"><h2>' . esc_html__( 'Einstellungs-Button', 'b83-cookie-banner' ) . '</h2>';
+		echo '<p class="description">' . esc_html__( 'Über diesen Button ändern Besucher ihre Auswahl. Liegt rechts unten schon ein „Nach oben“-Button der Website, eignet sich der Reiter oder die linke Seite. Ein- und ausschalten unter „Allgemein“.', 'b83-cookie-banner' ) . '</p>';
+		echo '<table class="form-table" role="presentation"><tbody>';
+		echo '<tr><th scope="row"><label for="b83-cb-reopen-style">' . esc_html__( 'Darstellung', 'b83-cookie-banner' ) . '</label></th><td><select id="b83-cb-reopen-style" name="b83_cb[design][reopen_style]" data-b83-design>';
+		foreach ( array(
+			'round' => __( 'Rundes Symbol in der Ecke', 'b83-cookie-banner' ),
+			'tab'   => __( 'Schmaler Reiter am Rand', 'b83-cookie-banner' ),
+		) as $value => $label ) {
+			echo '<option value="' . esc_attr( $value ) . '"' . selected( $d['reopen_style'], $value, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></td></tr>';
+		echo '<tr><th scope="row"><label for="b83-cb-reopen-side">' . esc_html__( 'Seite', 'b83-cookie-banner' ) . '</label></th><td><select id="b83-cb-reopen-side" name="b83_cb[design][reopen_side]" data-b83-design>';
+		foreach ( array(
+			'auto'  => __( 'Wie der Banner (rechts nur bei „Unten rechts“)', 'b83-cookie-banner' ),
+			'left'  => __( 'Links', 'b83-cookie-banner' ),
+			'right' => __( 'Rechts', 'b83-cookie-banner' ),
+		) as $value => $label ) {
+			echo '<option value="' . esc_attr( $value ) . '"' . selected( $d['reopen_side'], $value, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></td></tr>';
+		$this->number_row( 'reopen_bottom', __( 'Abstand unten', 'b83-cookie-banner' ), $d, 'px', __( 'Gilt für das runde Symbol.', 'b83-cookie-banner' ), 'round' );
+		$this->number_row( 'reopen_tab_y', __( 'Höhe am Rand', 'b83-cookie-banner' ), $d, '%', __( 'Gilt für den Reiter: 10 % = weit oben, 90 % = weit unten.', 'b83-cookie-banner' ), 'tab' );
+		echo '</tbody></table></div>';
+
 		echo '<div class="b83-cb-card"><h2>' . esc_html__( 'Eigenes CSS', 'b83-cookie-banner' ) . '</h2>';
 		echo '<textarea class="large-text code" rows="6" name="b83_cb[custom_css]" aria-label="' . esc_attr__( 'Eigenes CSS', 'b83-cookie-banner' ) . '">' . esc_textarea( $s['custom_css'] ) . '</textarea>';
 		echo '<p class="description">' . esc_html__( 'Nur für Sonderfälle, ohne <style>-Tag. Zustimmen und Ablehnen müssen gleich auffällig bleiben.', 'b83-cookie-banner' ) . '</p></div>';
@@ -315,6 +340,16 @@ final class AdminPage {
 		echo '<button type="button" class="b83-cb__btn b83-cb__btn--secondary">Einstellungen</button>';
 		echo '</div></div></div></div></div>';
 		echo '<p class="description">' . esc_html__( 'Mit der Maus über die Buttons fahren, um die Hover-Farben zu sehen. Änderungen werden erst mit „Speichern“ übernommen.', 'b83-cookie-banner' ) . '</p>';
+
+		// Einstellungs-Button am Rand eines angedeuteten Browserfensters.
+		$reopen_class = 'b83-cb-reopen b83-cb-reopen--preview b83-cb-reopen--' . $d['reopen_style'] . ' b83-cb-reopen--side-' . Settings::reopen_side( $s );
+		echo '<h3>' . esc_html__( 'Einstellungs-Button', 'b83-cookie-banner' ) . '</h3>';
+		echo '<div class="b83-cb-reopen-stage"><span class="b83-cb-reopen-stage__totop" aria-hidden="true">&uarr;</span>';
+		echo '<button type="button" id="b83-cb-reopen" class="' . esc_attr( $reopen_class ) . '" aria-label="' . esc_attr( Texts::get( 'reopen', 'de' ) ) . '">';
+		echo '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-4-4 4 4 0 0 1-4-4 2 2 0 0 1-2-2zm-3.5 7a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm6 5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-7 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm4-9a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>';
+		echo '<span class="b83-cb-reopen__label" aria-hidden="true">' . esc_html( Texts::get( 'reopen', 'de' ) ) . '</span>';
+		echo '</button></div>';
+		echo '<p class="description">' . esc_html__( 'Der graue Pfeil rechts unten steht für einen „Nach oben“-Button der Website.', 'b83-cookie-banner' ) . '</p>';
 		echo '</div></div>';
 
 		echo '</div>';
@@ -335,17 +370,18 @@ final class AdminPage {
 	/**
 	 * @param array<string,mixed> $d Design-Einstellungen.
 	 */
-	private function number_row( string $key, string $label, array $d, string $unit, string $hint = '' ): void {
+	private function number_row( string $key, string $label, array $d, string $unit, string $hint = '', string $only = '' ): void {
 		[ $min, $max ] = Settings::DESIGN_NUMBERS[ $key ];
 		printf(
-			'<tr><th scope="row"><label for="b83-cb-%1$s">%2$s</label></th><td><input type="range" id="b83-cb-%1$s" min="%3$d" max="%4$d" value="%5$d" name="b83_cb[design][%1$s]" data-b83-design data-unit="%6$s"> <output for="b83-cb-%1$s">%5$d %6$s</output>%7$s</td></tr>',
+			'<tr%8$s><th scope="row"><label for="b83-cb-%1$s">%2$s</label></th><td><input type="range" id="b83-cb-%1$s" min="%3$d" max="%4$d" value="%5$d" name="b83_cb[design][%1$s]" data-b83-design data-unit="%6$s"> <output for="b83-cb-%1$s">%5$d %6$s</output>%7$s</td></tr>',
 			esc_attr( $key ),
 			esc_html( $label ),
 			$min,
 			$max,
 			(int) $d[ $key ],
 			esc_html( $unit ),
-			'' !== $hint ? '<p class="description">' . esc_html( $hint ) . '</p>' : ''
+			'' !== $hint ? '<p class="description">' . esc_html( $hint ) . '</p>' : '',
+			'' !== $only ? ' data-b83-reopen-only="' . esc_attr( $only ) . '"' : ''
 		);
 	}
 

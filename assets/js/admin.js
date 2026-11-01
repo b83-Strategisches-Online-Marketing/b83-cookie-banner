@@ -67,10 +67,28 @@
 			"btn2-border": field("btn2_border"),
 			"btn2-hbg": field("btn2_hover_bg"),
 			"btn2-htext": field("btn2_hover_text"),
-			"btn2-hborder": field("btn2_hover_border")
+			"btn2-hborder": field("btn2_hover_border"),
+			"reopen-bottom": px(field("reopen_bottom")),
+			"reopen-y": (parseInt(field("reopen_tab_y"), 10) || 70) + "%"
 		};
 		Object.keys(vars).forEach(function (k) {
 			if (vars[k]) root.style.setProperty("--b83-cb-" + k, vars[k]);
+		});
+		updateReopen();
+	}
+
+	/* Einstellungs-Button: Darstellung, Seite und passende Felder */
+	function updateReopen() {
+		var style = field("reopen_style") || "round";
+		var side = field("reopen_side") || "auto";
+		if (side === "auto") side = $("#b83-cb-position").val() === "bottom_right" ? "right" : "left";
+
+		var $btn = $(".b83-cb-reopen-stage #b83-cb-reopen");
+		$btn.removeClass("b83-cb-reopen--round b83-cb-reopen--tab b83-cb-reopen--side-left b83-cb-reopen--side-right")
+			.addClass("b83-cb-reopen--" + style + " b83-cb-reopen--side-" + side);
+
+		$("[data-b83-reopen-only]").each(function () {
+			$(this).toggle($(this).data("b83ReopenOnly") === style);
 		});
 	}
 
@@ -82,7 +100,7 @@
 			$(".b83-cb-color").wpColorPicker({ change: schedule, clear: schedule });
 		}
 
-		$(document).on("input change", "[data-b83-design], [name='b83_cb[accent_color]']", function () {
+		$(document).on("input change", "[data-b83-design], [name='b83_cb[accent_color]'], #b83-cb-position", function () {
 			if (this.type === "range") {
 				$(this).next("output").text(this.value + " " + ($(this).data("unit") || ""));
 			}

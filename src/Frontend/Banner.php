@@ -221,8 +221,13 @@ final class Banner {
 			</div>
 		</div>
 		<?php if ( $settings['show_reopen'] ) : ?>
-			<button type="button" id="b83-cb-reopen" class="b83-cb-reopen b83-cb-reopen--<?php echo esc_attr( $settings['position'] ); ?>" data-b83-cb-open aria-label="<?php echo esc_attr( $t( 'reopen' ) ); ?>" title="<?php echo esc_attr( $t( 'reopen' ) ); ?>" hidden>
+			<?php
+			// Die alte Positionsklasse bleibt für eigenes CSS erhalten; die Lage bestimmen Stil und Seite.
+			$reopen_class = 'b83-cb-reopen b83-cb-reopen--' . $settings['position'] . ' b83-cb-reopen--' . $settings['design']['reopen_style'] . ' b83-cb-reopen--side-' . Settings::reopen_side( $settings );
+			?>
+			<button type="button" id="b83-cb-reopen" class="<?php echo esc_attr( $reopen_class ); ?>" data-b83-cb-open aria-label="<?php echo esc_attr( $t( 'reopen' ) ); ?>" title="<?php echo esc_attr( $t( 'reopen' ) ); ?>" hidden>
 				<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-4-4 4 4 0 0 1-4-4 2 2 0 0 1-2-2zm-3.5 7a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm6 5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-7 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm4-9a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+				<span class="b83-cb-reopen__label" aria-hidden="true"><?php echo esc_html( $t( 'reopen' ) ); ?></span>
 			</button>
 		<?php endif; ?>
 		<?php
