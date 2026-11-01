@@ -185,6 +185,12 @@
 			var frag = tpl.content ? tpl.content.cloneNode(true) : document.createRange().createContextualFragment(tpl.innerHTML);
 			box.innerHTML = "";
 			box.appendChild(frag);
+			// Hat ein Lazy-Load-Plugin das iFrame umgeschrieben (src = about:blank), echte Adresse einsetzen.
+			box.querySelectorAll("iframe[data-lazy-src], iframe[data-src]").forEach(function (f) {
+				var real = f.getAttribute("data-lazy-src") || f.getAttribute("data-src");
+				var cur = f.getAttribute("src") || "";
+				if (real && (cur === "" || cur === "about:blank" || cur.indexOf("data:") === 0)) f.setAttribute("src", real);
+			});
 			box.classList.add("is-loaded");
 			box.removeAttribute("data-b83-blocked");
 		});
@@ -348,6 +354,13 @@
 			if (allow) {
 				e.preventDefault();
 				var id = allow.getAttribute("data-b83-cb-allow");
+				// Dienst blockiert, aber nicht (mehr) konfiguriert, z. B. aus einem
+				// veralteten Cache: Der Klick ist die Zustimmung für diesen Inhalt.
+				// Ohne Konfiguration lässt sie sich nicht speichern, also nur hier laden.
+				if (!services[id]) {
+					unblock(id);
+					return;
+				}
 				var current = getConsent();
 				var list = current ? current.services.slice() : [];
 				if (list.indexOf(id) === -1) list.push(id);

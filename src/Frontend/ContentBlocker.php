@@ -34,6 +34,7 @@ final class ContentBlocker {
 		add_filter( 'widget_block_content', array( $this, 'filter_html' ), 99 );
 		add_filter( 'embed_oembed_html', array( $this, 'filter_html' ), 99 );
 		add_filter( 'elementor/widget/render_content', array( $this, 'filter_elementor' ), 99, 2 );
+		add_action( 'elementor/frontend/widget/before_render', array( $this, 'neutralize_elementor_video' ) );
 		add_shortcode( 'b83_youtube', array( $this, 'youtube_shortcode' ) );
 	}
 
@@ -116,19 +117,56 @@ final class ContentBlocker {
 			return $content;
 		}
 
-		if ( is_object( $widget ) && method_exists( $widget, 'get_name' ) && 'video' === $widget->get_name() && method_exists( $widget, 'get_settings_for_display' ) ) {
-			$settings = (array) $widget->get_settings_for_display();
-			$type     = (string) ( $settings['video_type'] ?? 'youtube' );
-			$url      = (string) ( 'vimeo' === $type ? ( $settings['vimeo_url'] ?? '' ) : ( $settings['youtube_url'] ?? '' ) );
-			$embed    = self::embed_url( 'vimeo' === $type ? 'vimeo' : 'youtube', $url );
-			$service  = 'vimeo' === $type ? 'vimeo' : 'youtube';
-			if ( '' !== $embed && in_array( $type, array( 'youtube', 'vimeo' ), true ) && isset( $this->active()[ $service ] ) ) {
-				$iframe = '<iframe src="' . esc_url( $embed ) . '" width="640" height="360" style="width:100%;height:100%;border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen loading="lazy" title="' . esc_attr( ucfirst( $service ) ) . '"></iframe>';
-				return $this->placeholder( $service, $iframe, '16 / 9' );
-			}
+		$video = $this->elementor_video( $widget );
+		if ( null !== $video ) {
+			$iframe = '<iframe src="' . esc_url( $video['embed'] ) . '" width="640" height="360" style="width:100%;height:100%;border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen loading="lazy" title="' . esc_attr( ucfirst( $video['service'] ) ) . '"></iframe>';
+			return $this->placeholder( $video['service'], $iframe, '16 / 9' );
 		}
 
 		return $this->filter_html( $content );
+	}
+
+	/**
+	 * Elementor-Video-Widget: Das Elementor-Skript liest Typ und URL aus
+	 * data-settings und lädt die YouTube-API sofort, auch wenn der Player
+	 * durch den Platzhalter ersetzt ist. Elementor hängt sein Video-Skript
+	 * über den Widget-Typ an; mit einem eigenen Typ am Wrapper läuft es nicht
+	 * (Animationen und andere globale Effekte bleiben erhalten).
+	 * Nach der Zustimmung setzt das Skript ein normales iFrame ein.
+	 *
+	 * @param object $widget Widget.
+	 */
+	public function neutralize_elementor_video( $widget ): void {
+		if ( $this->skip() || null === $this->elementor_video( $widget ) || ! method_exists( $widget, 'set_render_attribute' ) ) {
+			return;
+		}
+		$widget->set_render_attribute( '_wrapper', 'data-widget_type', 'b83-cb-video.default' );
+	}
+
+	/**
+	 * Blockiertes Elementor-Video-Widget erkennen.
+	 *
+	 * @param mixed $widget Widget.
+	 * @return array{service: string, embed: string}|null
+	 */
+	private function elementor_video( $widget ): ?array {
+		if ( ! is_object( $widget ) || ! method_exists( $widget, 'get_name' ) || 'video' !== $widget->get_name() || ! method_exists( $widget, 'get_settings_for_display' ) ) {
+			return null;
+		}
+		$settings = (array) $widget->get_settings_for_display();
+		$type     = (string) ( $settings['video_type'] ?? 'youtube' );
+		if ( ! in_array( $type, array( 'youtube', 'vimeo' ), true ) || ! isset( $this->active()[ $type ] ) ) {
+			return null;
+		}
+		$url   = (string) ( 'vimeo' === $type ? ( $settings['vimeo_url'] ?? '' ) : ( $settings['youtube_url'] ?? '' ) );
+		$embed = self::embed_url( $type, $url );
+		if ( '' === $embed ) {
+			return null;
+		}
+		return array(
+			'service' => $type,
+			'embed'   => $embed,
+		);
 	}
 
 	/**
@@ -167,6 +205,18 @@ final class ContentBlocker {
 		return '';
 	}
 
+	/**
+	 * Lazy-Load-Plugins (WP Rocket, LiteSpeed, Autoptimize …) vom iFrame im
+	 * Template fernhalten: Sie ersetzen sonst src durch about:blank, und das
+	 * Video bleibt nach der Zustimmung leer.
+	 */
+	private static function no_lazy( string $iframe ): string {
+		if ( false !== stripos( $iframe, 'data-no-lazy' ) ) {
+			return $iframe;
+		}
+		return (string) preg_replace( '/^<iframe\b/i', '<iframe data-no-lazy="1" data-skip-lazy="1"', $iframe, 1 );
+	}
+
 	private function placeholder( string $service_id, string $iframe, string $ratio ): string {
 		$service = $this->active()[ $service_id ];
 		$lang    = Settings::lang();
@@ -184,7 +234,7 @@ final class ContentBlocker {
 		$html .= '<button type="button" class="b83-cb-blocked__btn" data-b83-cb-allow="' . esc_attr( $service_id ) . '">' . esc_html( Texts::get( 'blocked_button', $lang ) ) . '</button>';
 		$html .= '<p class="b83-cb-blocked__note">' . esc_html( sprintf( Texts::get( 'blocked_note', $lang ), $name ) ) . '</p>';
 		$html .= '</div>';
-		$html .= '<template class="b83-cb-blocked__embed">' . $iframe . '</template>';
+		$html .= '<template class="b83-cb-blocked__embed">' . self::no_lazy( $iframe ) . '</template>';
 		$html .= '</div>';
 		return $html;
 	}

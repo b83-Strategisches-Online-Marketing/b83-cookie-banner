@@ -62,10 +62,16 @@ final class Plugin {
 	}
 
 	/**
-	 * Banner-HTML und Texte stecken in jeder zwischengespeicherten Seite:
-	 * nach dem Speichern den gesamten Seiten-Cache leeren.
+	 * Banner-HTML, Texte und Platzhalter stecken in jeder zwischengespeicherten
+	 * Seite: nach dem Speichern Seiten-Cache und Elementor-Cache leeren.
 	 */
 	public static function purge_page_cache(): void {
+		// Elementor: zwischengespeicherte Widget-Ausgaben (Element Caching)
+		// enthalten die Platzhalter, müssen also ebenfalls neu erzeugt werden.
+		if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) ) {
+			\Elementor\Plugin::$instance->files_manager->clear_cache();
+		}
+		delete_post_meta_by_key( '_elementor_element_cache' );
 		if ( function_exists( 'rocket_clean_domain' ) ) {
 			rocket_clean_domain(); // WP Rocket.
 		}

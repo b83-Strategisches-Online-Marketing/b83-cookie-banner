@@ -1,5 +1,13 @@
 # Changelog
 
+## 7.1.2 – 2026-11-01
+
+### Behoben
+- YouTube-Platzhalter ließ sich nicht öffnen, wenn das Widget aus dem Elementor-Cache kam, YouTube in den Einstellungen aber nicht (mehr) aktiv war: „Inhalt laden“ lädt den Inhalt jetzt in jedem Fall
+- Elementor-Video-Widget lud die YouTube-API (youtube.com/iframe_api) schon vor der Zustimmung
+- WP Rocket und andere Lazy-Load-Plugins schrieben das iFrame im Platzhalter auf about:blank um; das Video blieb nach der Zustimmung leer
+- Beim Speichern der Einstellungen wird jetzt auch der Elementor-Cache geleert
+
 ## 7.1.1 – 2026-10-16
 
 ### Behoben
