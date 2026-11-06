@@ -186,7 +186,7 @@ final class Updater {
 	private function description(): string {
 		$html = '';
 		$html .= '<p>' . esc_html__( 'Cookie-Banner für Websites in Österreich und der EU. Auf der ersten Ebene wählen Besucher „Alle akzeptieren“, „Alle ablehnen“ oder „Einstellungen“, auf der zweiten entscheiden sie je Kategorie und Dienst.', 'b83-cookie-banner' ) . '</p>';
-		$html .= '<p>' . esc_html__( 'Google Analytics, Tag Manager, Meta Pixel sowie eingebettete Videos und Karten lädt der Banner erst nach der Zustimmung. Jede Entscheidung landet mit einer Einwilligungs-ID im Protokoll, ohne IP-Adresse.', 'b83-cookie-banner' ) . '</p>';
+		$html .= '<p>' . esc_html__( 'Google Analytics, Google Ads, Tag Manager, Meta Pixel sowie eingebettete Videos und Karten lädt der Banner erst nach der Zustimmung. Jede Entscheidung landet mit einer Einwilligungs-ID im Protokoll, ohne IP-Adresse.', 'b83-cookie-banner' ) . '</p>';
 		$html .= '<ul>';
 		$html .= '<li>' . esc_html__( 'Dienste-Katalog mit Anbieter, Zweck, Cookies, Drittland und Datenschutzlink, dazu eigene Dienste', 'b83-cookie-banner' ) . '</li>';
 		$html .= '<li>' . esc_html__( 'Google Consent Mode v2', 'b83-cookie-banner' ) . '</li>';

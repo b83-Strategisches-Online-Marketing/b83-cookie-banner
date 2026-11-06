@@ -139,6 +139,30 @@ final class Services {
 				'cookie_patterns' => array( '_ga', '_ga_*', '_gid', '_gat*' ),
 				'hosts'           => array(),
 			),
+			'google_ads'  => array(
+				'category'        => 'marketing',
+				'name'            => 'Google Ads',
+				'provider'        => self::GOOGLE,
+				'purpose'         => array(
+					'de' => 'Messung, ob Besucher nach einem Klick auf eine Google-Anzeige eine Anfrage, Buchung oder einen Kauf abschließen (Conversion-Tracking), sowie Remarketing, also Werbung für frühere Besucher auf anderen Websites.',
+					'en' => 'Measuring whether visitors complete an enquiry, booking or purchase after clicking a Google ad (conversion tracking), and remarketing, i.e. showing ads to previous visitors on other websites.',
+				),
+				'cookies'         => array(
+					'de' => '_gcl_au (3 Monate) sowie Cookies von Google auf doubleclick.net, z. B. IDE (13 Monate)',
+					'en' => '_gcl_au (3 months) and Google cookies on doubleclick.net, e.g. IDE (13 months)',
+				),
+				'privacy_url'     => 'https://policies.google.com/privacy',
+				'third_country'   => $usa,
+				'fields'          => array(
+					'ads_id' => array(
+						'label'   => 'Conversion-ID',
+						'pattern' => '/^AW-\d{6,15}$/',
+						'hint'    => 'AW-XXXXXXXXX – leer lassen, wenn Google Ads über den Tag Manager läuft',
+					),
+				),
+				'cookie_patterns' => array( '_gcl_au', '_gcl_*' ),
+				'hosts'           => array(),
+			),
 			'meta_pixel'  => array(
 				'category'        => 'marketing',
 				'name'            => 'Meta Pixel',

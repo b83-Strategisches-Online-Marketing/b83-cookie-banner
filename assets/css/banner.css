@@ -292,3 +292,15 @@ body .b83-cb-blocked .b83-cb-blocked__btn:hover { background: var(--b83-cb-btn-h
 @media (prefers-reduced-motion: reduce) {
 	#b83-cb .b83-cb__switch-ui, #b83-cb .b83-cb__switch-ui::after, #b83-cb .b83-cb__btn { transition: none; }
 }
+
+/* Shortcode [b83_cookie_list] für die Datenschutzerklärung: übernimmt Schrift und Farben des Themes */
+.b83-cookie-list__table { width: 100%; margin: 0 0 1.5em; border-collapse: collapse; }
+.b83-cookie-list__table caption { padding: 0 0 .4em; font-weight: 700; text-align: left; }
+.b83-cookie-list__table th,
+.b83-cookie-list__table td { padding: .45em .6em; border-top: 1px solid rgba(0, 0, 0, .12); text-align: left; vertical-align: top; }
+.b83-cookie-list__table th { width: 32%; font-weight: 600; }
+@media (max-width: 600px) {
+	.b83-cookie-list__table th,
+	.b83-cookie-list__table td { display: block; width: auto; }
+	.b83-cookie-list__table td { border-top: 0; padding-top: 0; }
+}

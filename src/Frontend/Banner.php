@@ -29,6 +29,7 @@ final class Banner {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_action( 'wp_footer', array( $this, 'render' ), 100 );
 		add_shortcode( 'b83_cookie_settings', array( $this, 'settings_link' ) );
+		add_shortcode( 'b83_cookie_list', array( $this, 'cookie_list' ) );
 
 		// WP Rocket: Banner-Skripte nie verzögern oder zusammenfassen.
 		add_filter( 'rocket_delay_js_exclusions', array( $this, 'rocket_exclusions' ) );
@@ -310,6 +311,89 @@ final class Banner {
 	 * @param array<string,string>|string $atts    Attribute.
 	 * @param string|null                 $content Linktext.
 	 */
+	/**
+	 * Shortcode [b83_cookie_list]: alle aktiven Dienste nach Kategorien, für
+	 * die Datenschutzerklärung. Folgt automatisch den Banner-Einstellungen.
+	 *
+	 * Attribute: heading (h2–h6, Standard h3), lang (de/en), link (1/0:
+	 * Button zu den Cookie-Einstellungen am Ende).
+	 *
+	 * @param array<string,string>|string $atts Attribute.
+	 */
+	public function cookie_list( $atts ): string {
+		$atts     = shortcode_atts(
+			array(
+				'heading' => 'h3',
+				'lang'    => Settings::lang(),
+				'link'    => '1',
+			),
+			(array) $atts,
+			'b83_cookie_list'
+		);
+		$heading  = in_array( $atts['heading'], array( 'h2', 'h3', 'h4', 'h5', 'h6' ), true ) ? $atts['heading'] : 'h3';
+		$lang     = in_array( $atts['lang'], array( 'de', 'en' ), true ) ? $atts['lang'] : 'de';
+		$settings = Settings::get();
+		$t        = static function ( string $key ) use ( $lang ): string {
+			return Texts::get( $key, $lang );
+		};
+
+		$grouped = array();
+		foreach ( Services::active( $settings, $lang ) as $id => $service ) {
+			$grouped[ $service['category'] ][ $id ] = $service;
+		}
+
+		$html = '<div class="b83-cookie-list">';
+		foreach ( Services::categories() as $cat => $info ) {
+			if ( 'necessary' !== $cat && empty( $grouped[ $cat ] ) ) {
+				continue;
+			}
+			$html .= '<' . $heading . '>' . esc_html( $info['label'][ $lang ] ?? $info['label']['de'] ) . '</' . $heading . '>';
+			$html .= '<p>' . esc_html( $info['description'][ $lang ] ?? $info['description']['de'] ) . '</p>';
+
+			if ( 'necessary' === $cat ) {
+				$html .= $this->list_table(
+					'b83 Cookie Banner',
+					array(
+						$t( 'provider' ) => esc_html( $t( 'this_website' ) ),
+						$t( 'purpose' )  => esc_html( $t( 'consent_cookie' ) ),
+						$t( 'cookies' )  => esc_html( self::COOKIE . ' (' . sprintf( $t( 'months' ), (int) $settings['lifetime_months'] ) . ')' ),
+					)
+				);
+			}
+			foreach ( $grouped[ $cat ] ?? array() as $service ) {
+				$rows = array(
+					$t( 'provider' ) => esc_html( $service['provider'] ),
+					$t( 'purpose' )  => esc_html( $service['purpose'] ),
+					$t( 'cookies' )  => esc_html( $service['cookies'] ),
+				);
+				if ( '' !== $service['third_country'] ) {
+					$rows[ $t( 'third_country' ) ] = esc_html( $service['third_country'] );
+				}
+				if ( '' !== $service['privacy_url'] ) {
+					$rows[ $t( 'privacy' ) ] = '<a href="' . esc_url( $service['privacy_url'] ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $t( 'privacy_link' ) ) . '</a>';
+				}
+				$html .= $this->list_table( $service['name'], $rows );
+			}
+		}
+		if ( '0' !== (string) $atts['link'] ) {
+			$html .= '<p>' . esc_html( $t( 'list_change' ) ) . ' <button type="button" class="b83-cookie-reopen-link" data-b83-cb-open>' . esc_html( $t( 'reopen' ) ) . '</button></p>';
+		}
+		return $html . '</div>';
+	}
+
+	/**
+	 * Eine Tabelle je Dienst. Werte sind bereits escaped.
+	 *
+	 * @param array<string,string> $rows Bezeichnung => HTML.
+	 */
+	private function list_table( string $name, array $rows ): string {
+		$html = '<table class="b83-cookie-list__table"><caption>' . esc_html( $name ) . '</caption><tbody>';
+		foreach ( $rows as $label => $value ) {
+			$html .= '<tr><th scope="row">' . esc_html( $label ) . '</th><td>' . $value . '</td></tr>';
+		}
+		return $html . '</tbody></table>';
+	}
+
 	public function settings_link( $atts, $content = null ): string {
 		$label = ( null !== $content && '' !== trim( wp_strip_all_tags( $content ) ) ) ? wp_strip_all_tags( $content ) : Texts::get( 'reopen', Settings::lang() );
 		return '<button type="button" class="b83-cookie-reopen-link" data-b83-cb-open>' . esc_html( $label ) . '</button>';

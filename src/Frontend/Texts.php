@@ -118,6 +118,10 @@ final class Texts {
 			'de' => 'Mit dem Laden stimmen Sie der Nutzung von %s zu. Widerruf jederzeit über die Cookie-Einstellungen.',
 			'en' => 'By loading, you consent to the use of %s. You can withdraw at any time via the cookie settings.',
 		),
+		'list_change'      => array(
+			'de' => 'Ihre Auswahl können Sie jederzeit ändern oder widerrufen:',
+			'en' => 'You can change or withdraw your selection at any time:',
+		),
 		'always_active'    => array(
 			'de' => 'Immer aktiv',
 			'en' => 'Always active',

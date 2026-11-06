@@ -6,7 +6,7 @@ Cookie-Banner für WordPress mit Fokus auf DSGVO, österreichischem TKG 2021 und
 
 Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgang Grabs-Schrempf, office@b83.at.
 
-- **Version:** 7.4.0
+- **Version:** 7.5.0
 - **Voraussetzungen:** WordPress 6.2+, PHP 8.1+
 - **Lizenz:** GPL-2.0-or-later
 
@@ -16,7 +16,7 @@ Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgan
 
 - **Zwei Ebenen:** Erste Ebene mit „Alle akzeptieren“, „Alle ablehnen“ und „Einstellungen“ – Zustimmen und Ablehnen gleich gestaltet. Zweite Ebene mit Kategorien und einzelnen Diensten.
 - **Informierte Einwilligung:** Je Dienst Anbieter, Zweck, Cookies/Speicherdauer, Drittland und Datenschutzlink.
-- **Dienste-Katalog:** Google Tag Manager, Google Analytics, Meta Pixel, YouTube, Vimeo, Google Maps – plus eigene Dienste (z. B. Wetter-Widgets) mit Skript-Code und Domains zum Blockieren.
+- **Dienste-Katalog:** Google Tag Manager, Google Analytics, Google Ads, Meta Pixel, YouTube, Vimeo, Google Maps – plus eigene Dienste (z. B. Wetter-Widgets) mit Skript-Code und Domains zum Blockieren.
 - **Google Consent Mode v2:** Standardmäßig alles verweigert, Aktualisierung nach Zustimmung.
 - **Blockieren eingebetteter Inhalte** (YouTube, Vimeo, Google Maps, eigene Domains) in Beiträgen, oEmbeds, Widgets und allen Elementor-Widgets – mit Platzhalter und Zustimmung je Dienst. YouTube wird über youtube-nocookie.com, Vimeo mit „Do Not Track“ geladen.
 - **Widerruf** jederzeit über den Einstellungs-Button oder den Shortcode; abgewählte Dienste werden sofort gestoppt, ihre Cookies gelöscht. Der Button erscheint als rundes Symbol in der Ecke oder als schmaler Reiter am linken oder rechten Rand, unabhängig von der Position des Banners.
@@ -31,12 +31,16 @@ Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgan
 ```
 [b83_cookie_settings]Cookie-Einstellungen[/b83_cookie_settings]   Einstellungen erneut öffnen
 [b83_youtube url="https://youtu.be/…" title="…"]                   YouTube-Video mit Platzhalter
+[b83_cookie_list]                                                  Liste aller aktiven Dienste für die Datenschutzerklärung
 ```
+
+`[b83_cookie_list]` gibt je Kategorie eine Tabelle pro Dienst aus (Anbieter, Zweck, Cookies, Drittland, Datenschutzlink) und folgt automatisch den Banner-Einstellungen. Attribute: `heading="h3"` (h2–h6), `lang="de"` (de/en), `link="0"` blendet den Link zu den Cookie-Einstellungen am Ende aus.
 
 ## Google Tag Manager
 
 - Wird erst geladen, wenn der Besucher mindestens einem Statistik- oder Marketing-Dienst zustimmt.
-- Im Tag Manager bei jedem Tag die Einwilligungsprüfung aktivieren (Google Analytics: `analytics_storage`, Werbung: `ad_storage`).
+- Im Tag Manager bei jedem Tag die Einwilligungsprüfung aktivieren (Google Analytics: `analytics_storage`, Google Ads und andere Werbung: `ad_storage`, `ad_user_data`, `ad_personalization`).
+- Google Consent Mode v2: Vor jedem Google-Tag stehen alle Signale auf „denied“. Zustimmung zu einem Statistik-Dienst setzt `analytics_storage` auf „granted“, Zustimmung zu einem Marketing-Dienst `ad_storage`, `ad_user_data` und `ad_personalization`.
 - Ereignis `b83_consent` mit Datenschicht-Variable `b83_services` (Liste der erlaubten Dienste) steht als Auslöser zur Verfügung.
 
 ## Umstieg von Version 6.x

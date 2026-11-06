@@ -1,5 +1,14 @@
 # Changelog
 
+## 7.5.0 – 2026-11-06
+
+### Neu
+- Dienst-Vorlage „Google Ads“ (Kategorie Marketing) mit Conversion-ID (AW-…) oder Einbindung über den Tag Manager; Zustimmung setzt im Consent Mode ad_storage, ad_user_data und ad_personalization
+- Shortcode `[b83_cookie_list]` für die Datenschutzerklärung: alle aktiven Dienste je Kategorie mit Anbieter, Zweck, Cookies, Drittland und Datenschutzlink, dazu ein Link zu den Cookie-Einstellungen
+
+### Geändert
+- Google Analytics und Google Ads teilen sich eine gtag.js-Einbindung
+
 ## 7.4.0 – 2026-11-01
 
 ### Neu

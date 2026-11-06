@@ -149,6 +149,19 @@
 		});
 	}
 
+	/** gtag.js nur einmal laden; Google Analytics und Google Ads teilen sich die Bibliothek. */
+	function gtagConfig(id) {
+		window.dataLayer = window.dataLayer || [];
+		if (typeof window.gtag !== "function") {
+			window.gtag = function () { window.dataLayer.push(arguments); };
+		}
+		if (!document.getElementById("b83-cb-gtag")) {
+			script("https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(id), "b83-cb-gtag");
+			window.gtag("js", new Date());
+		}
+		window.gtag("config", id);
+	}
+
 	var loaders = {
 		gtm: function (c) {
 			if (!c.gtm_id) return;
@@ -158,9 +171,11 @@
 		},
 		ga4: function (c) {
 			if (!c.measurement_id) return; // läuft dann über den Tag Manager
-			script("https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(c.measurement_id), "b83-cb-ga4");
-			window.gtag("js", new Date());
-			window.gtag("config", c.measurement_id);
+			gtagConfig(c.measurement_id);
+		},
+		google_ads: function (c) {
+			if (!c.ads_id) return; // läuft dann über den Tag Manager
+			gtagConfig(c.ads_id);
 		},
 		meta_pixel: function (c) {
 			if (!c.pixel_id || window.fbq) return;

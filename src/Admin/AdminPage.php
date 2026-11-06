@@ -587,7 +587,7 @@ final class AdminPage {
 			),
 			__( 'Google Tag Manager', 'b83-cookie-banner' )        => array(
 				__( 'Der Tag Manager wird erst geladen, wenn der Besucher einem Statistik- oder Marketing-Dienst zustimmt. Google Consent Mode v2 ist vorab auf „verweigert“ gesetzt.', 'b83-cookie-banner' ),
-				__( 'Im Tag Manager bei jedem Tag die Einwilligungsprüfung aktivieren (z. B. Google Analytics: analytics_storage, Meta Pixel: ad_storage).', 'b83-cookie-banner' ),
+				__( 'Im Tag Manager bei jedem Tag die Einwilligungsprüfung aktivieren (z. B. Google Analytics: analytics_storage, Google Ads und Meta Pixel: ad_storage).', 'b83-cookie-banner' ),
 				__( 'Zusätzlich steht das Ereignis „b83_consent“ mit der Variable „b83_services“ (Liste der erlaubten Dienste) als Auslöser zur Verfügung.', 'b83-cookie-banner' ),
 				__( 'Den Tag Manager nicht zusätzlich über ein anderes Plugin oder das Theme einbinden.', 'b83-cookie-banner' ),
 			),
