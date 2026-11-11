@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.7.0 – 2026-11-11
+
+### Neu
+- Einstellungs-Button auf Smartphones (unter 768 px Breite) optional ausblenden, Tab „Design“ → „Einstellungs-Button“; Standard bleibt sichtbar
+
 ## 7.6.0 – 2026-11-11
 
 ### Neu

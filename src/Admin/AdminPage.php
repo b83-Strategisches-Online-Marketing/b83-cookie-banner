@@ -341,6 +341,13 @@ final class AdminPage {
 		echo '</select></td></tr>';
 		$this->number_row( 'reopen_bottom', __( 'Abstand unten', 'b83-cookie-banner' ), $d, 'px', __( 'Gilt für das runde Symbol.', 'b83-cookie-banner' ), 'round' );
 		$this->number_row( 'reopen_tab_y', __( 'Höhe am Rand', 'b83-cookie-banner' ), $d, '%', __( 'Gilt für den Reiter: 10 % = weit oben, 90 % = weit unten.', 'b83-cookie-banner' ), 'tab' );
+		printf(
+			'<tr><th scope="row">%1$s</th><td><input type="hidden" name="b83_cb[design][reopen_hide_mobile]" value="0"><label><input type="checkbox" name="b83_cb[design][reopen_hide_mobile]" value="1"%2$s> %3$s</label><p class="description">%4$s</p></td></tr>',
+			esc_html__( 'Smartphones', 'b83-cookie-banner' ),
+			checked( $d['reopen_hide_mobile'], true, false ),
+			esc_html__( 'Auf Smartphones ausblenden (unter 768 px Breite)', 'b83-cookie-banner' ),
+			esc_html__( 'Dann muss der Widerruf dort anders erreichbar sein, z. B. mit dem Shortcode [b83_cookie_settings] im Footer. Er muss so einfach sein wie die Zustimmung.', 'b83-cookie-banner' )
+		);
 		echo '</tbody></table></div>';
 
 		echo '<div class="b83-cb-card"><h2>' . esc_html__( 'Eigenes CSS', 'b83-cookie-banner' ) . '</h2>';

@@ -263,6 +263,10 @@ body .b83-cb-blocked .b83-cb-blocked__btn:focus-visible {
 @media (prefers-reduced-motion: reduce) {
 	#b83-cb-reopen .b83-cb-reopen__label { transition: none; }
 }
+/* Optional auf Smartphones ausblenden (Tab „Design“) */
+@media (max-width: 767px) {
+	#b83-cb-reopen.b83-cb-reopen--hide-mobile { display: none !important; }
+}
 body button.b83-cookie-reopen-link, body button.b83-cookie-reopen-link:hover, body button.b83-cookie-reopen-link:focus { appearance: none; background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; margin: 0; min-height: 0; font: inherit; color: inherit; text-decoration: underline; text-transform: none; letter-spacing: inherit; cursor: pointer; }
 
 /* Platzhalter für blockierte Inhalte */

@@ -178,6 +178,7 @@ final class Settings {
 			'reopen_side'       => 'auto',
 			'reopen_bottom'     => 16,
 			'reopen_tab_y'      => 70,
+			'reopen_hide_mobile' => false,
 		);
 	}
 
@@ -218,6 +219,8 @@ final class Settings {
 			if ( isset( self::DESIGN_NUMBERS[ $key ] ) ) {
 				[ $min, $max ]  = self::DESIGN_NUMBERS[ $key ];
 				$clean[ $key ] = is_numeric( $value ) ? max( $min, min( $max, (int) $value ) ) : $default;
+			} elseif ( 'reopen_hide_mobile' === $key ) {
+				$clean[ $key ] = self::bool( $value );
 			} elseif ( 'reopen_style' === $key ) {
 				$clean[ $key ] = is_string( $value ) && in_array( $value, self::REOPEN_STYLES, true ) ? $value : $default;
 			} elseif ( 'reopen_side' === $key ) {
