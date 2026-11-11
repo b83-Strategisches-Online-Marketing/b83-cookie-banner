@@ -1,5 +1,15 @@
 # Changelog
 
+## 7.6.0 – 2026-11-11
+
+### Neu
+- Einstellung „Sprache des Banners“ (Tab „Allgemein“): automatisch nach der Website-Sprache, immer Deutsch oder immer Englisch. Ersetzt den Schalter „Englisch“
+- Hinweis im Backend, wenn die Website auf Englisch eingestellt ist, der Banner aber fest auf Deutsch steht
+
+### Geändert
+- „Automatisch“ zeigt bei jeder nicht deutschen Website-Sprache die englischen Texte (bisher Deutsch)
+- Bestehende Websites behalten ihr Verhalten: Schalter „Englisch“ an → Automatisch, aus → Immer Deutsch. Neue Installationen starten mit Automatisch
+
 ## 7.5.0 – 2026-11-06
 
 ### Neu

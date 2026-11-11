@@ -47,13 +47,20 @@ final class Settings {
 
 	/** Aktuelle Sprache des Banners: 'en', wenn aktiviert und die Seite englisch ist, sonst 'de'. */
 	public static function lang(): string {
-		$settings = self::get();
-		if ( ! $settings['en_enabled'] ) {
-			return 'de';
+		$mode = self::get()['language'];
+		if ( 'de' === $mode || 'en' === $mode ) {
+			return $mode;
 		}
-		// WPML, Polylang und TranslatePress setzen die Locale der aktuellen Sprache.
+		return self::locale_lang();
+	}
+
+	/**
+	 * Sprache der Website: Deutsch bei deutscher Locale, sonst Englisch.
+	 * WPML, Polylang und TranslatePress setzen die Locale der aktuellen Sprache.
+	 */
+	public static function locale_lang(): string {
 		$locale = (string) apply_filters( 'b83_cookie_banner_locale', get_locale() );
-		return str_starts_with( strtolower( (string) $locale ), 'en' ) ? 'en' : 'de';
+		return str_starts_with( strtolower( $locale ), 'de' ) ? 'de' : 'en';
 	}
 
 	/**
@@ -87,7 +94,7 @@ final class Settings {
 			'show_reopen'          => true,
 			'accent_color'         => '#d96f21',
 			'custom_css'           => '',
-			'en_enabled'           => false,
+			'language'             => 'auto',
 			'texts'                => array(
 				'de' => array(
 					'title'       => 'Ihre Privatsphäre ist uns wichtig',
@@ -174,6 +181,9 @@ final class Settings {
 		);
 	}
 
+	/** Sprache des Banners: automatisch nach der Website, immer Deutsch oder immer Englisch. */
+	public const LANGUAGES = array( 'auto', 'de', 'en' );
+
 	/** Einstellungs-Button: rundes Symbol in der Ecke oder schmaler Reiter am Rand. */
 	public const REOPEN_STYLES = array( 'round', 'tab' );
 
@@ -236,7 +246,11 @@ final class Settings {
 	 * @return array<string,mixed>
 	 */
 	public static function sanitize( array $raw, bool $keep_missing = true ): array {
-		$d   = self::defaults();
+		$d = self::defaults();
+		// Bis Version 7.5 gab es nur den Schalter „Englisch“; ohne ihn war der Banner immer deutsch.
+		if ( ! isset( $raw['language'] ) && array_key_exists( 'en_enabled', $raw ) ) {
+			$raw['language'] = self::bool( $raw['en_enabled'] ) ? 'auto' : 'de';
+		}
 		$raw = $keep_missing ? array_replace_recursive( $d, self::only_arrays_where_expected( $raw, $d ) ) : $raw;
 
 		$position = is_string( $raw['position'] ?? null ) ? $raw['position'] : '';
@@ -251,7 +265,7 @@ final class Settings {
 			'show_reopen'          => self::bool( $raw['show_reopen'] ?? false ),
 			'accent_color'         => $color ? $color : '#d96f21',
 			'custom_css'           => self::css( $raw['custom_css'] ?? '' ),
-			'en_enabled'           => self::bool( $raw['en_enabled'] ?? false ),
+			'language'             => in_array( $raw['language'] ?? '', self::LANGUAGES, true ) ? (string) $raw['language'] : 'auto',
 			'texts'                => array(),
 			'services'             => array(),
 			'custom'               => array(),

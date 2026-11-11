@@ -188,6 +188,15 @@ final class AdminPage {
 		if ( ! $settings['enabled'] ) {
 			echo '<div class="notice notice-info"><p>' . esc_html__( 'Der Banner ist derzeit ausgeschaltet.', 'b83-cookie-banner' ) . '</p></div>';
 		}
+		if ( 'de' === $settings['language'] && 'en' === Settings::locale_lang() ) {
+			echo '<div class="notice notice-warning"><p>' . esc_html(
+				sprintf(
+					/* translators: %s: Locale der Website, z. B. en_GB */
+					__( 'Die Website ist auf %s eingestellt, der Banner erscheint aber immer auf Deutsch. Unter „Allgemein“ die Sprache des Banners auf „Automatisch“ stellen.', 'b83-cookie-banner' ),
+					get_locale()
+				)
+			) . ' <a href="' . esc_url( self::url( 'allgemein' ) ) . '">' . esc_html__( 'Zu den Einstellungen', 'b83-cookie-banner' ) . '</a></p></div>';
+		}
 	}
 
 	/* ---------------------------------------------------------------------
@@ -202,7 +211,21 @@ final class AdminPage {
 
 		$this->row_checkbox( 'show_reopen', __( 'Einstellungs-Symbol', 'b83-cookie-banner' ), $s['show_reopen'], __( 'Kleines Symbol am Bildschirmrand, über das Besucher ihre Auswahl jederzeit ändern können', 'b83-cookie-banner' ), __( 'Wenn ausgeschaltet: unbedingt den Shortcode [b83_cookie_settings] z. B. im Footer einbauen – der Widerruf muss so einfach sein wie die Zustimmung.', 'b83-cookie-banner' ) );
 
-		$this->row_checkbox( 'en_enabled', __( 'Englisch', 'b83-cookie-banner' ), $s['en_enabled'], __( 'Auf englischen Seiten (WPML, Polylang, TranslatePress) die englischen Texte verwenden', 'b83-cookie-banner' ) );
+		echo '<tr><th scope="row"><label for="b83-cb-language">' . esc_html__( 'Sprache des Banners', 'b83-cookie-banner' ) . '</label></th><td><select id="b83-cb-language" name="b83_cb[language]">';
+		foreach ( array(
+			'auto' => __( 'Automatisch nach der Website-Sprache', 'b83-cookie-banner' ),
+			'de'   => __( 'Immer Deutsch', 'b83-cookie-banner' ),
+			'en'   => __( 'Immer Englisch', 'b83-cookie-banner' ),
+		) as $value => $label ) {
+			echo '<option value="' . esc_attr( $value ) . '"' . selected( $s['language'], $value, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select><p class="description">' . esc_html(
+			sprintf(
+				/* translators: %s: Locale der Website, z. B. de_AT */
+				__( 'Automatisch: deutsche Texte bei deutscher Website, sonst englische. Erkennt auch die aktuelle Sprache von WPML, Polylang und TranslatePress. Diese Website: %s.', 'b83-cookie-banner' ),
+				get_locale()
+			)
+		) . '</p></td></tr>';
 
 		$this->row_number( 'lifetime_months', __( 'Gültigkeit der Einwilligung', 'b83-cookie-banner' ), $s['lifetime_months'], 1, 12, __( 'Monate. Danach wird erneut gefragt.', 'b83-cookie-banner' ) );
 		$this->row_number( 'log_retention_months', __( 'Aufbewahrung des Protokolls', 'b83-cookie-banner' ), $s['log_retention_months'], 6, 120, __( 'Monate. Ältere Einträge werden automatisch gelöscht.', 'b83-cookie-banner' ) );
@@ -670,7 +693,7 @@ final class AdminPage {
 	 */
 	public static function merge( array $current, array $post, string $tab, bool $allow_code ): array {
 		if ( 'allgemein' === $tab ) {
-			foreach ( array( 'enabled', 'show_reopen', 'en_enabled', 'lifetime_months', 'log_retention_months' ) as $key ) {
+			foreach ( array( 'enabled', 'show_reopen', 'language', 'lifetime_months', 'log_retention_months' ) as $key ) {
 				if ( array_key_exists( $key, $post ) ) {
 					$current[ $key ] = $post[ $key ];
 				}
