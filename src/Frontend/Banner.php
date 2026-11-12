@@ -377,7 +377,7 @@ final class Banner {
 			}
 		}
 		if ( '0' !== (string) $atts['link'] ) {
-			$html .= '<p>' . esc_html( $t( 'list_change' ) ) . ' <button type="button" class="b83-cookie-reopen-link" data-b83-cb-open>' . esc_html( $t( 'reopen' ) ) . '</button></p>';
+			$html .= '<p>' . esc_html( $t( 'list_change' ) ) . ' ' . self::reopen_link( $t( 'reopen' ) ) . '</p>';
 		}
 		return $html . '</div>';
 	}
@@ -396,7 +396,19 @@ final class Banner {
 	}
 
 	public function settings_link( $atts, $content = null ): string {
-		$label = ( null !== $content && '' !== trim( wp_strip_all_tags( $content ) ) ) ? wp_strip_all_tags( $content ) : Texts::get( 'reopen', Settings::lang() );
-		return '<button type="button" class="b83-cookie-reopen-link" data-b83-cb-open>' . esc_html( $label ) . '</button>';
+		$atts  = shortcode_atts( array( 'text' => '' ), (array) $atts, 'b83_cookie_settings' );
+		$label = trim( wp_strip_all_tags( (string) $atts['text'] ) );
+		if ( '' === $label && null !== $content ) {
+			$label = trim( wp_strip_all_tags( $content ) );
+		}
+		return self::reopen_link( '' !== $label ? $label : Texts::get( 'reopen', Settings::lang() ) );
+	}
+
+	/**
+	 * Link zu den Cookie-Einstellungen. Ein echter Link übernimmt Farbe und
+	 * Hover der Website (Footer-Links); das Skript fängt den Klick ab.
+	 */
+	private static function reopen_link( string $label ): string {
+		return '<a href="#cookie-einstellungen" role="button" class="b83-cookie-reopen-link" data-b83-cb-open>' . esc_html( $label ) . '</a>';
 	}
 }

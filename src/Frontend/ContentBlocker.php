@@ -28,6 +28,13 @@ final class ContentBlocker {
 	/** @var array<string, array<string,mixed>>|null */
 	private ?array $active = null;
 
+	/**
+	 * Feste Höhe für den nächsten Platzhalter (Elementor-Karte), je Gerät.
+	 *
+	 * @var array<string,string>|null
+	 */
+	private ?array $fixed_height = null;
+
 	public function register(): void {
 		add_filter( 'the_content', array( $this, 'filter_html' ), 99 );
 		add_filter( 'widget_text_content', array( $this, 'filter_html' ), 99 );
@@ -88,14 +95,21 @@ final class ContentBlocker {
 			$iframe = str_replace( $m[2], esc_attr( $new ), $iframe );
 		}
 
-		$ratio = '16 / 9';
-		if ( preg_match( '/\bwidth\s*=\s*["\']?(\d{2,4})/i', $iframe, $w ) && preg_match( '/\bheight\s*=\s*["\']?(\d{2,4})/i', $iframe, $h ) && (int) $h[1] > 0 ) {
-			$ratio = (int) $w[1] . ' / ' . (int) $h[1];
-		} elseif ( 'google_maps' === $service ) {
-			$ratio = '4 / 3';
+		if ( null !== $this->fixed_height ) {
+			return $this->placeholder( $service, $iframe, '', $this->fixed_height );
 		}
 
-		return $this->placeholder( $service, $iframe, $ratio );
+		// Pixelangaben; „100%“ zählt nicht als Breite.
+		$width  = preg_match( '/\bwidth\s*=\s*["\']?(\d{2,4})(?![\d%])/i', $iframe, $w ) ? (int) $w[1] : 0;
+		$height = preg_match( '/\bheight\s*=\s*["\']?(\d{2,4})(?![\d%])/i', $iframe, $h ) ? (int) $h[1] : 0;
+		if ( $width > 0 && $height > 0 ) {
+			return $this->placeholder( $service, $iframe, $width . ' / ' . $height );
+		}
+		if ( $height > 0 ) {
+			// Volle Breite mit fester Höhe (typisch bei Karten): Höhe übernehmen statt Seitenverhältnis.
+			return $this->placeholder( $service, $iframe, '', array( 'desktop' => $height . 'px' ) );
+		}
+		return $this->placeholder( $service, $iframe, 'google_maps' === $service ? '4 / 3' : '16 / 9' );
 	}
 
 	/** YouTube ohne Tracking-Cookies vor dem Abspielen, Vimeo mit „Do Not Track“. */
@@ -120,6 +134,16 @@ final class ContentBlocker {
 	public function filter_elementor( $content, $widget ) {
 		if ( ! is_string( $content ) || $this->skip() ) {
 			return $content;
+		}
+
+		// Elementor-Karte: Höhe aus dem Widget statt Seitenverhältnis, sonst entsteht
+		// bei breiten Spalten ein hoher Leerraum unter der Karte.
+		$map_height = $this->elementor_map_height( $widget );
+		if ( null !== $map_height ) {
+			$this->fixed_height = $map_height;
+			$out                = $this->filter_html( $content );
+			$this->fixed_height = null;
+			return $out;
 		}
 
 		$video = $this->elementor_video( $widget );
@@ -150,6 +174,30 @@ final class ContentBlocker {
 
 	/**
 	 * Blockiertes Elementor-Video-Widget erkennen.
+	 *
+	 * @param mixed $widget Widget.
+	 * @return array{service: string, embed: string}|null
+	 */
+	private function elementor_map_height( $widget ): ?array {
+		if ( ! is_object( $widget ) || ! method_exists( $widget, 'get_name' ) || 'google_maps' !== $widget->get_name() || ! isset( $this->active()['google_maps'] ) || ! method_exists( $widget, 'get_settings_for_display' ) ) {
+			return null;
+		}
+		$settings = (array) $widget->get_settings_for_display();
+		$heights  = array();
+		foreach ( array( 'desktop' => 'height', 'tablet' => 'height_tablet', 'mobile' => 'height_mobile' ) as $device => $key ) {
+			$value = $settings[ $key ] ?? null;
+			$size  = is_array( $value ) ? ( $value['size'] ?? '' ) : '';
+			$unit  = is_array( $value ) ? (string) ( $value['unit'] ?? 'px' ) : 'px';
+			if ( is_numeric( $size ) && (float) $size > 0 && in_array( $unit, array( 'px', 'vh', 'em', 'rem' ), true ) ) {
+				$heights[ $device ] = ( (float) $size + 0 ) . $unit;
+			}
+		}
+		$heights['desktop'] = $heights['desktop'] ?? '300px'; // Standardhöhe des Elementor-Widgets.
+		return $heights;
+	}
+
+	/**
+	 * Elementor-Video-Widget: YouTube- oder Vimeo-Adresse, wenn der Dienst blockiert wird.
 	 *
 	 * @param mixed $widget Widget.
 	 * @return array{service: string, embed: string}|null
@@ -222,13 +270,27 @@ final class ContentBlocker {
 		return (string) preg_replace( '/^<iframe\b/i', '<iframe data-b83-cb-embed="1" data-no-lazy="1" data-skip-lazy="1"', $iframe, 1 );
 	}
 
-	private function placeholder( string $service_id, string $iframe, string $ratio ): string {
+	/**
+	 * @param string                    $ratio  Seitenverhältnis, z. B. „16 / 9“ (leer bei fester Höhe).
+	 * @param array<string,string>|null $height Feste Höhe je Gerät (desktop, tablet, mobile).
+	 */
+	private function placeholder( string $service_id, string $iframe, string $ratio, ?array $height = null ): string {
 		$service = $this->active()[ $service_id ];
 		$lang    = Settings::lang();
 		$name    = (string) $service['name'];
 		$owner   = '' !== $service['provider'] ? (string) strtok( (string) $service['provider'], ',' ) : $name;
 
-		$html  = '<div class="b83-cb-blocked" data-b83-blocked="' . esc_attr( $service_id ) . '" style="aspect-ratio:' . esc_attr( $ratio ) . '">';
+		if ( null !== $height ) {
+			$style = '--b83-cb-h:' . $height['desktop'];
+			foreach ( array( 'tablet' => 't', 'mobile' => 'm' ) as $device => $suffix ) {
+				if ( isset( $height[ $device ] ) ) {
+					$style .= ';--b83-cb-h-' . $suffix . ':' . $height[ $device ];
+				}
+			}
+			$html = '<div class="b83-cb-blocked b83-cb-blocked--fixed" data-b83-blocked="' . esc_attr( $service_id ) . '" style="' . esc_attr( $style ) . '">';
+		} else {
+			$html = '<div class="b83-cb-blocked" data-b83-blocked="' . esc_attr( $service_id ) . '" style="aspect-ratio:' . esc_attr( $ratio ) . '">';
+		}
 		$html .= '<div class="b83-cb-blocked__inner">';
 		$html .= '<p class="b83-cb-blocked__title">' . esc_html( sprintf( Texts::get( 'blocked_title', $lang ), $name ) ) . '</p>';
 		$html .= '<p class="b83-cb-blocked__text">' . esc_html( sprintf( Texts::get( 'blocked_text', $lang ), $name, $owner ) );

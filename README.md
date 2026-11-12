@@ -6,7 +6,7 @@ Cookie-Banner für WordPress mit Fokus auf DSGVO, österreichischem TKG 2021 und
 
 Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgang Grabs-Schrempf, office@b83.at.
 
-- **Version:** 7.7.0
+- **Version:** 7.7.1
 - **Voraussetzungen:** WordPress 6.2+, PHP 8.1+
 - **Lizenz:** GPL-2.0-or-later
 
@@ -29,10 +29,12 @@ Entwickelt von [b83 – Strategisches Online Marketing](https://b83.at), Wolfgan
 ## Shortcodes
 
 ```
-[b83_cookie_settings]Cookie-Einstellungen[/b83_cookie_settings]   Einstellungen erneut öffnen
+[b83_cookie_settings text="Cookies"]                               Link „Cookies“, öffnet die Einstellungen
 [b83_youtube url="https://youtu.be/…" title="…"]                   YouTube-Video mit Platzhalter
 [b83_cookie_list]                                                  Liste aller aktiven Dienste für die Datenschutzerklärung
 ```
+
+`[b83_cookie_settings]` ist ein normaler Link und übernimmt Farbe und Hover der Website, z. B. im Footer. Ohne `text` lautet er „Cookie-Einstellungen“ bzw. „Cookie settings“.
 
 `[b83_cookie_list]` gibt je Kategorie eine Tabelle pro Dienst aus (Anbieter, Zweck, Cookies, Drittland, Datenschutzlink) und folgt automatisch den Banner-Einstellungen. Attribute: `heading="h3"` (h2–h6), `lang="de"` (de/en), `link="0"` blendet den Link zu den Cookie-Einstellungen am Ende aus.
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 7.7.1 – 2026-11-12
+
+### Behoben
+- Google-Maps-Platzhalter in Elementor nutzte das Seitenverhältnis 4:3 statt der eingestellten Kartenhöhe. In breiten Spalten entstand darunter ein großer Leerraum, auch nach dem Laden der Karte. Der Platzhalter übernimmt jetzt die Höhe des Widgets, je Gerät
+- iFrames mit fester Höhe und Breite „100%“ bekommen ebenfalls diese Höhe; „100%“ wurde bisher als 100 Pixel Breite gelesen
+- Shortcode `[b83_cookie_settings]` gibt einen Link aus statt eines Buttons und übernimmt damit Farbe und Hover der Website. Neuer Text kürzer mit `text="Cookies"`
+
 ## 7.7.0 – 2026-11-11
 
 ### Neu

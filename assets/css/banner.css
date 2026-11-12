@@ -267,12 +267,17 @@ body .b83-cb-blocked .b83-cb-blocked__btn:focus-visible {
 @media (max-width: 767px) {
 	#b83-cb-reopen.b83-cb-reopen--hide-mobile { display: none !important; }
 }
+/* Ältere Ausgabe als <button> (zwischengespeicherte Seiten); neu ist es ein Link im Stil der Website */
 body button.b83-cookie-reopen-link, body button.b83-cookie-reopen-link:hover, body button.b83-cookie-reopen-link:focus { appearance: none; background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0; margin: 0; min-height: 0; font: inherit; color: inherit; text-decoration: underline; text-transform: none; letter-spacing: inherit; cursor: pointer; }
 
 /* Platzhalter für blockierte Inhalte */
 .b83-cb-blocked { position: relative; width: 100%; min-height: 220px; background: var(--b83-cb-soft); border: 1px solid var(--b83-cb-line); border-radius: min(10px, var(--b83-cb-radius)); overflow: hidden; display: flex; align-items: center; justify-content: center; font-family: var(--b83-cb-font); }
 .b83-cb-blocked.is-loaded { background: none; border: 0; min-height: 0; display: block; }
 .b83-cb-blocked.is-loaded iframe { width: 100%; height: 100%; border: 0; display: block; }
+/* Feste Höhe statt Seitenverhältnis (Elementor-Karte, iFrame mit Höhe und voller Breite); Umbrüche wie Elementor */
+.b83-cb-blocked--fixed { box-sizing: border-box; aspect-ratio: auto; height: var(--b83-cb-h); }
+@media (max-width: 1024px) { .b83-cb-blocked--fixed { height: var(--b83-cb-h-t, var(--b83-cb-h)); } }
+@media (max-width: 767px) { .b83-cb-blocked--fixed { height: var(--b83-cb-h-m, var(--b83-cb-h-t, var(--b83-cb-h))); } }
 .b83-cb-blocked__inner { max-width: 460px; padding: 20px; text-align: center; font-size: 13.5px; line-height: 1.5; color: var(--b83-cb-text); }
 .b83-cb-blocked__title { margin: 0 0 6px; font-weight: 700; font-size: 15px; }
 .b83-cb-blocked__text { margin: 0 0 12px; }
