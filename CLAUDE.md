@@ -10,7 +10,7 @@
 - **Präfix für Funktionen, Optionen, Hooks:** `b83_cookie_banner_` (Namespace: `B83\CookieBanner`)
 - **Repository:** github.com/b83-Strategisches-Online-Marketing/b83-cookie-banner (öffentlich)
 - **Vertrieb:** intern, Updates über GitHub-Releases
-- **Im Einsatz auf:** u. a. abtenau-info.at, sporer.at, at-hena.ch, swstb.at
+- **Im Einsatz auf:** mehrere Kundenseiten
 - **Zweck in einem Satz:** Cookie-Banner für eine rechtskonforme Einwilligung mit zwei Ebenen, Dienste-Katalog, Google Consent Mode v2, Blockieren von YouTube, Vimeo und Google Maps, Einwilligungsprotokoll und Mehrsprachigkeit (DE/EN).
 
 ## b83-Standards (gelten für alle b83-Plugins)
